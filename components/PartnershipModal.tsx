@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { Stall } from '../types';
 import { Icon } from './Icon';
@@ -34,8 +35,6 @@ const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, pr
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div 
         className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md transform transition-all"
-        // Close on outside click is tricky to implement robustly without libraries, so we use the backdrop.
-        // A simple implementation could be adding onClick to the backdrop div and checking e.target === e.currentTarget
       >
         <div className="p-6">
           <div className="flex items-start justify-between">

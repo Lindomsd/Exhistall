@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { Stall, Review, PartnershipRequest } from '../types';
 import Header from '../components/Header';
@@ -12,9 +13,10 @@ interface StallPageProps {
   currentUserStall: Stall;
   partnershipRequests: PartnershipRequest[];
   onProposePartnership: (recipientStall: Stall, message: string) => void;
+  onNavigate: (page: string) => void;
 }
 
-const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, partnershipRequests, onProposePartnership }) => {
+const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, partnershipRequests, onProposePartnership, onNavigate }) => {
   const [activeTab, setActiveTab] = useState('about');
   const [isPartnershipModalOpen, setPartnershipModalOpen] = useState(false);
 
@@ -121,7 +123,7 @@ const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, 
 
   return (
     <>
-      <Header onBack={onBack} />
+      <Header onBack={onBack} onNavigate={onNavigate} />
       <main className="bg-brand-light dark:bg-brand-dark pb-16">
         {/* Stall Header */}
         <div className="relative h-48 md:h-64 bg-gray-200">
@@ -179,7 +181,7 @@ const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, 
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer onNavigate={onNavigate}/>
       {!isOwnStall && (
         <PartnershipModal 
             isOpen={isPartnershipModalOpen}

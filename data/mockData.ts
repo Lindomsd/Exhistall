@@ -1,4 +1,9 @@
-import type { Stall, PartnershipRequest } from '../types';
+import type { Stall, PartnershipRequest, TeamMember, FaqItem, BlogPost, Job, Exhibition, User } from '../types';
+
+export const mockUsers: User[] = [
+  { id: 'u1', name: 'Admin User', email: 'admin@exhistalls.com', password: 'password123', role: 'admin' },
+  { id: 'u2', name: 'Regular User', email: 'user@example.com', password: 'password123', role: 'user' },
+];
 
 export const mockStalls: Stall[] = [
   {
@@ -29,6 +34,7 @@ export const mockStalls: Stall[] = [
     location: { address: '123 Bread St, Foodville', lat: 34.0522, lng: -118.2437 },
     contact: { phone: '555-0101', email: 'contact@artisanbakes.com', website: 'artisanbakes.com' },
     featured: true,
+    status: 'active',
   },
   {
     id: '2',
@@ -55,6 +61,7 @@ export const mockStalls: Stall[] = [
     ],
     location: { address: '45 Craft Ave, Styleburg', lat: 40.7128, lng: -74.0060 },
     contact: { phone: '555-0102', email: 'support@evergreenleather.com', website: 'evergreenleather.com' },
+    status: 'active',
   },
   {
     id: '3',
@@ -80,6 +87,7 @@ export const mockStalls: Stall[] = [
     location: { address: '789 Digital Dr, Tech City', lat: 37.7749, lng: -122.4194 },
     contact: { phone: '555-0103', email: 'hello@pixelperfect.design', website: 'pixelperfect.design' },
     featured: true,
+    status: 'active',
   },
     {
     id: '4',
@@ -105,7 +113,46 @@ export const mockStalls: Stall[] = [
     location: { address: '15 Bloom Lane, Gardenia', lat: 43.6532, lng: -79.3832 },
     contact: { phone: '555-0104', email: 'grow@greenthumb.com', website: 'greenthumb.com' },
     featured: false,
+    status: 'active',
   },
 ];
 
 export const mockPartnershipRequests: PartnershipRequest[] = [];
+
+export const mockTeamMembers: TeamMember[] = [
+  { id: 'tm1', name: 'Linda Dlamini', title: 'Founder & CEO', imageUrl: 'https://picsum.photos/seed/tm1/400/400' },
+];
+
+export const mockFaqs: { [key: string]: FaqItem[] } = {
+  general: [
+    { question: 'What is Exhistalls?', answer: 'Exhistalls is a virtual marketplace platform that allows small businesses to create online stalls, showcase their products, and connect with customers and other businesses.' },
+    { question: 'How do I create an account?', answer: 'You can create an account by clicking the "Create a Stall" button on our homepage and following the registration process. It\'s quick and easy!' },
+  ],
+  stallholders: [
+    { question: 'What are the fees for selling on Exhistalls?', answer: 'We offer various pricing plans, including a free tier to get you started. Please visit our Pricing page for more details on features and fees.' },
+    { question: 'How do I get my stall featured?', answer: 'Our "Featured" plan gives your stall premium placement on the homepage and in search results. You can upgrade your plan at any time from your stall dashboard.' },
+  ],
+  shoppers: [
+    { question: 'How do I contact a stallholder?', answer: 'On each stall page, you can find contact information, including email and a messaging feature to communicate directly with the business.' },
+    { question: 'Is my payment information secure?', answer: 'Yes, we use industry-standard encryption and partner with trusted payment processors to ensure all transactions are secure.' },
+  ],
+};
+
+export const mockBlogPosts: BlogPost[] = [
+  { id: 'bp1', title: '5 Tips for a Stunning Virtual Stall Display', excerpt: 'Learn how to make your online stall stand out with these simple and effective visual merchandising tips.', imageUrl: 'https://picsum.photos/seed/bp1/600/400', author: 'Jane Doe', date: '2023-10-25' },
+  { id: 'bp2', title: 'Success Story: How Artisan Bakes Grew Their Business', excerpt: 'Discover how a local bakery used Exhistalls to reach a wider audience and increase their online sales by 200%.', imageUrl: 'https://picsum.photos/seed/bp2/600/400', author: 'John Smith', date: '2023-10-18' },
+  { id: 'bp3', title: 'Networking 101: Building Partnerships on Exhistalls', excerpt: 'Your fellow stallholders are not just competitors; they can be powerful partners. Here\'s how to build valuable B2B connections.', imageUrl: 'https://picsum.photos/seed/bp3/600/400', author: 'Emily White', date: '2023-10-11' },
+];
+
+export const mockJobs: Job[] = [
+  { id: 'job1', title: 'Senior Frontend Engineer', department: 'Engineering', location: 'Remote', type: 'Full-time' },
+  { id: 'job2', title: 'Product Manager', department: 'Product', location: 'Remote', type: 'Full-time' },
+  { id: 'job3', title: 'Digital Marketing Specialist', department: 'Marketing', location: 'New York, NY', type: 'Full-time' },
+  { id: 'job4', title: 'Customer Support Associate', department: 'Support', location: 'Remote', type: 'Part-time' },
+];
+
+export const mockExhibitions: Exhibition[] = [
+  { id: 'ex1', title: 'Holiday Makers Market', date: 'December 1-3, 2023', description: 'A festive showcase of handcrafted gifts, holiday decor, and seasonal treats from our most creative stallholders.', status: 'upcoming', imageUrl: 'https://picsum.photos/seed/ex1/600/400' },
+  { id: 'ex2', title: 'Summer Digital Services Expo', date: 'August 15, 2023', description: 'Connect with top digital agencies and freelancers offering services in web design, marketing, and more.', status: 'past', imageUrl: 'https://picsum.photos/seed/ex2/600/400' },
+  { id: 'ex3', title: 'Artisanal Food Fair', date: 'July 20-22, 2023', description: 'A celebration of culinary craftsmanship, featuring the best in local and artisanal food and drink products.', status: 'past', imageUrl: 'https://picsum.photos/seed/ex3/600/400' },
+];
