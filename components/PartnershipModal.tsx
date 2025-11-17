@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { Stall } from '../types';
 import { Icon } from './Icon';
@@ -6,12 +5,12 @@ import { Icon } from './Icon';
 interface PartnershipModalProps {
   isOpen: boolean;
   onClose: () => void;
-  proposerStall: Stall;
+  proposerStallId: string;
   recipientStall: Stall;
   onSubmit: (message: string) => void;
 }
 
-const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, proposerStall, recipientStall, onSubmit }) => {
+const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, proposerStallId, recipientStall, onSubmit }) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -63,7 +62,7 @@ const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, pr
               id="partnership-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={`Hi ${recipientStall.name.split(' ')[0]}, I'm from ${proposerStall.name} and I'd love to discuss a potential partnership...`}
+              placeholder={`Hi ${recipientStall.name.split(' ')[0]}, I'd love to discuss a potential partnership...`}
               rows={5}
               className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-brand-light dark:bg-brand-dark focus:ring-2 focus:ring-brand-blue dark:focus:ring-brand-gold focus:border-transparent outline-none transition"
               required

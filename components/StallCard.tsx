@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import type { Stall } from '../types';
 import { Icon } from './Icon';
@@ -15,13 +16,13 @@ const StallCard: React.FC<StallCardProps> = ({ stall, onClick }) => {
       onClick={() => onClick(stall)}
     >
       <div className="relative">
-        <img className="h-40 w-full object-cover" src={stall.bannerUrl} alt={`${stall.name} banner`} />
+        <img className="h-40 w-full object-cover" src={stall.banner_url} alt={`${stall.name} banner`} />
         <div className="absolute top-0 left-0 w-full h-full bg-black/30 group-hover:bg-black/10 transition-opacity duration-300"></div>
         <div className="absolute top-2 right-2 bg-brand-gold text-brand-blue text-xs font-bold px-2 py-1 rounded-full">{stall.category}</div>
       </div>
       <div className="p-4">
         <div className="flex items-center space-x-3">
-          <img className="h-12 w-12 rounded-full object-cover border-2 border-brand-light dark:border-slate-600" src={stall.logoUrl} alt={`${stall.name} logo`} />
+          <img className="h-12 w-12 rounded-full object-cover border-2 border-brand-light dark:border-slate-600" src={stall.logo_url} alt={`${stall.name} logo`} />
           <div>
             <h3 className="text-lg font-bold text-brand-blue dark:text-brand-gold">{stall.name}</h3>
             <p className="text-sm text-brand-secondary dark:text-slate-400 truncate">{stall.slogan}</p>

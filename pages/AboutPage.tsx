@@ -3,10 +3,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
 import { mockTeamMembers } from '../data/mockData';
-import type { TeamMember } from '../types';
+import type { TeamMember, User } from '../types';
 
 interface AboutPageProps {
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const TeamMemberCard: React.FC<{ member: TeamMember }> = ({ member }) => (
@@ -17,10 +20,10 @@ const TeamMemberCard: React.FC<{ member: TeamMember }> = ({ member }) => (
   </div>
 );
 
-const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
+const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main>
         {/* Hero Section */}
         <div className="bg-brand-blue">
@@ -50,7 +53,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         <div className="py-16 bg-brand-light dark:bg-brand-dark">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-10">Meet the Team</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {mockTeamMembers.map(member => (
                 <TeamMemberCard key={member.id} member={member} />
               ))}

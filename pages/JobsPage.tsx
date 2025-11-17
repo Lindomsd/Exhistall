@@ -3,10 +3,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
 import { mockJobs } from '../data/mockData';
-import type { Job } from '../types';
+import type { Job, User } from '../types';
 
 interface JobsPageProps {
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const JobListing: React.FC<{ job: Job }> = ({ job }) => (
@@ -24,7 +27,7 @@ const JobListing: React.FC<{ job: Job }> = ({ job }) => (
   </div>
 );
 
-const JobsPage: React.FC<JobsPageProps> = ({ onNavigate }) => {
+const JobsPage: React.FC<JobsPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
   const jobsByDepartment: { [key: string]: Job[] } = mockJobs.reduce((acc, job) => {
     (acc[job.department] = acc[job.department] || []).push(job);
     return acc;
@@ -32,7 +35,7 @@ const JobsPage: React.FC<JobsPageProps> = ({ onNavigate }) => {
 
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">

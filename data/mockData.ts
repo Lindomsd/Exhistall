@@ -1,18 +1,22 @@
 import type { Stall, PartnershipRequest, TeamMember, FaqItem, BlogPost, Job, Exhibition, User } from '../types';
 
 export const mockUsers: User[] = [
-  { id: 'u1', name: 'Admin User', email: 'admin@exhistalls.com', password: 'password123', role: 'admin' },
-  { id: 'u2', name: 'Regular User', email: 'user@example.com', password: 'password123', role: 'user' },
+  { id: 'user-1', name: 'Alice', email: 'alice@example.com', password: 'password', role: 'user', stallId: '1' },
+  { id: 'user-2', name: 'Bob', email: 'bob@example.com', password: 'password', role: 'user', stallId: '2' },
+  { id: 'user-3', name: 'Charlie', email: 'charlie@example.com', password: 'password', role: 'user', stallId: '4'},
+  { id: 'user-4', name: 'David', email: 'david@example.com', password: 'password', role: 'user'},
+  { id: 'mock-admin-user', name: 'Mock Admin', email: 'admin@exhistalls.com', password: 'password', role: 'admin', stallId: '3' },
 ];
 
 export const mockStalls: Stall[] = [
   {
     id: '1',
+    ownerId: 'user-1',
     name: 'Artisan Bakes',
     slogan: 'Handcrafted bread and pastries, baked with love.',
     category: 'Food & Drink',
-    logoUrl: 'https://picsum.photos/seed/ablogo/200/200',
-    bannerUrl: 'https://picsum.photos/seed/abbanner/1200/400',
+    logo_url: 'https://picsum.photos/seed/ablogo/200/200',
+    banner_url: 'https://picsum.photos/seed/abbanner/1200/400',
     description: 'Artisan Bakes is a small, family-owned bakery specializing in traditional sourdough bread, flaky croissants, and decadent cakes. We use only the finest locally-sourced ingredients to ensure every bite is a delight.',
     mission: 'To bring joy to our community through the simple pleasure of freshly baked goods, crafted with passion and integrity.',
     products: [
@@ -38,11 +42,12 @@ export const mockStalls: Stall[] = [
   },
   {
     id: '2',
+    ownerId: 'user-2',
     name: 'Evergreen Leather',
     slogan: 'Timeless leather goods, crafted to last a lifetime.',
     category: 'Fashion & Apparel',
-    logoUrl: 'https://picsum.photos/seed/ellogo/200/200',
-    bannerUrl: 'https://picsum.photos/seed/elbanner/1200/400',
+    logo_url: 'https://picsum.photos/seed/ellogo/200/200',
+    banner_url: 'https://picsum.photos/seed/elbanner/1200/400',
     description: 'At Evergreen Leather, we create high-quality, handcrafted leather products. From wallets and belts to bespoke bags, each item is meticulously made by our skilled artisans using sustainably sourced full-grain leather.',
     mission: 'To create beautiful, functional, and durable leather goods that stand the test of time and become cherished heirlooms.',
     products: [
@@ -65,11 +70,12 @@ export const mockStalls: Stall[] = [
   },
   {
     id: '3',
+    ownerId: 'mock-admin-user',
     name: 'Pixel Perfect Design',
     slogan: 'Bringing your digital vision to life.',
     category: 'Digital Services',
-    logoUrl: 'https://picsum.photos/seed/pplogo/200/200',
-    bannerUrl: 'https://picsum.photos/seed/ppbanner/1200/400',
+    logo_url: 'https://picsum.photos/seed/pplogo/200/200',
+    banner_url: 'https://picsum.photos/seed/ppbanner/1200/400',
     description: 'We are a boutique digital design agency offering a range of services including branding, web design, and UI/UX consultations. We help small businesses make a big impact online with stunning, user-friendly designs.',
     mission: 'To empower businesses with creative and effective digital solutions that drive growth and engagement.',
     products: [
@@ -91,11 +97,12 @@ export const mockStalls: Stall[] = [
   },
     {
     id: '4',
+    ownerId: 'user-3',
     name: 'Green Thumb Gardens',
     slogan: 'Your partner in creating beautiful green spaces.',
     category: 'Home & Craft',
-    logoUrl: 'https://picsum.photos/seed/gtglogo/200/200',
-    bannerUrl: 'https://picsum.photos/seed/gtgbanner/1200/400',
+    logo_url: 'https://picsum.photos/seed/gtglogo/200/200',
+    banner_url: 'https://picsum.photos/seed/gtgbanner/1200/400',
     description: 'Green Thumb Gardens offers professional landscaping services and a wide variety of plants and gardening supplies. Whether you need a complete garden redesign or just a few new plants, our experts are here to help you cultivate your dream garden.',
     mission: 'To connect people with nature by making gardening accessible, enjoyable, and sustainable for everyone.',
     products: [
@@ -113,14 +120,21 @@ export const mockStalls: Stall[] = [
     location: { address: '15 Bloom Lane, Gardenia', lat: 43.6532, lng: -79.3832 },
     contact: { phone: '555-0104', email: 'grow@greenthumb.com', website: 'greenthumb.com' },
     featured: false,
-    status: 'active',
+    status: 'pending_review',
   },
 ];
 
-export const mockPartnershipRequests: PartnershipRequest[] = [];
+export const mockPartnershipRequests: PartnershipRequest[] = [
+    { id: 'pr-1', proposerStallId: '2', recipientStallId: '1', message: 'Hey! Love your baked goods. We should do a collab for a gift basket.', status: 'pending', date: '2023-11-05' },
+    { id: 'pr-2', proposerStallId: '3', recipientStallId: '1', message: 'I can redesign your website to help you sell more cakes!', status: 'accepted', date: '2023-10-28' },
+    { id: 'pr-3', proposerStallId: '3', recipientStallId: '2', message: 'I love your leather work! Could I design a new logo for you?', status: 'declined', date: '2023-11-02' },
+];
 
 export const mockTeamMembers: TeamMember[] = [
   { id: 'tm1', name: 'Linda Dlamini', title: 'Founder & CEO', imageUrl: 'https://picsum.photos/seed/tm1/400/400' },
+  { id: 'tm2', name: 'Bongani Moyo', title: 'Lead Developer', imageUrl: 'https://picsum.photos/seed/tm2/400/400' },
+  { id: 'tm3', name: 'Thandiwe Khumalo', title: 'Community Manager', imageUrl: 'https://picsum.photos/seed/tm3/400/400' },
+  { id: 'tm4', name: 'Sipho Ndlovu', title: 'UX/UI Designer', imageUrl: 'https://picsum.photos/seed/tm4/400/400' },
 ];
 
 export const mockFaqs: { [key: string]: FaqItem[] } = {
@@ -131,6 +145,7 @@ export const mockFaqs: { [key: string]: FaqItem[] } = {
   stallholders: [
     { question: 'What are the fees for selling on Exhistalls?', answer: 'We offer various pricing plans, including a free tier to get you started. Please visit our Pricing page for more details on features and fees.' },
     { question: 'How do I get my stall featured?', answer: 'Our "Featured" plan gives your stall premium placement on the homepage and in search results. You can upgrade your plan at any time from your stall dashboard.' },
+     { question: 'My stall is "Pending Review". What does that mean?', answer: 'After you create a stall, our admin team reviews it to ensure it meets our community guidelines. This process usually takes 24-48 hours. You will be notified once your stall is approved and live.' },
   ],
   shoppers: [
     { question: 'How do I contact a stallholder?', answer: 'On each stall page, you can find contact information, including email and a messaging feature to communicate directly with the business.' },

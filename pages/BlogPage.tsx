@@ -3,10 +3,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
 import { mockBlogPosts } from '../data/mockData';
-import type { BlogPost } from '../types';
+import type { BlogPost, User } from '../types';
 
 interface BlogPageProps {
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const BlogPostCard: React.FC<{ post: BlogPost }> = ({ post }) => (
@@ -23,10 +26,10 @@ const BlogPostCard: React.FC<{ post: BlogPost }> = ({ post }) => (
   </div>
 );
 
-const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
+const BlogPage: React.FC<BlogPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">

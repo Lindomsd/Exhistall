@@ -3,10 +3,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
 import { mockFaqs } from '../data/mockData';
-import type { FaqItem } from '../types';
+import type { FaqItem, User } from '../types';
 
 interface HelpCenterPageProps {
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const FaqAccordion: React.FC<{ item: FaqItem }> = ({ item }) => {
@@ -29,7 +32,7 @@ const FaqAccordion: React.FC<{ item: FaqItem }> = ({ item }) => {
   );
 };
 
-const HelpCenterPage: React.FC<HelpCenterPageProps> = ({ onNavigate }) => {
+const HelpCenterPage: React.FC<HelpCenterPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
   const [activeTab, setActiveTab] = useState('general');
 
   const tabs = [
@@ -40,7 +43,7 @@ const HelpCenterPage: React.FC<HelpCenterPageProps> = ({ onNavigate }) => {
 
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="bg-brand-blue text-white">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">

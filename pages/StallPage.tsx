@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import type { Stall, Review, PartnershipRequest } from '../types';
+import type { Stall, Review, User } from '../types';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
@@ -10,13 +9,14 @@ import { Icon } from '../components/Icon';
 interface StallPageProps {
   stall: Stall;
   onBack: () => void;
-  currentUserStall: Stall;
-  partnershipRequests: PartnershipRequest[];
+  currentUser: User | null;
   onProposePartnership: (recipientStall: Stall, message: string) => void;
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  onLogout: () => void;
 }
 
-const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, partnershipRequests, onProposePartnership, onNavigate }) => {
+const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUser, onProposePartnership, onNavigate, onSearch, onLogout }) => {
   const [activeTab, setActiveTab] = useState('about');
   const [isPartnershipModalOpen, setPartnershipModalOpen] = useState(false);
 
@@ -33,13 +33,7 @@ const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, 
     { id: 'reviews', label: `Reviews (${stall.reviews.length})` },
   ];
 
-  const isOwnStall = currentUserStall.id === stall.id;
-
-  const existingProposal = partnershipRequests.find(
-    req =>
-      (req.proposerStall.id === currentUserStall.id && req.recipientStall.id === stall.id) ||
-      (req.proposerStall.id === stall.id && req.recipientStall.id === currentUserStall.id)
-  );
+  const isOwnStall = !!currentUser && currentUser.stallId === stall.id;
 
   const handlePropose = (message: string) => {
     onProposePartnership(stall, message);
@@ -123,18 +117,18 @@ const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, 
 
   return (
     <>
-      <Header onBack={onBack} onNavigate={onNavigate} />
+      <Header onBack={onBack} onNavigate={onNavigate} currentUser={currentUser} onLogout={onLogout} onSearch={onSearch} />
       <main className="bg-brand-light dark:bg-brand-dark pb-16">
         {/* Stall Header */}
         <div className="relative h-48 md:h-64 bg-gray-200">
-          <img src={stall.bannerUrl} alt={`${stall.name} banner`} className="w-full h-full object-cover" />
+          <img src={stall.banner_url} alt={`${stall.name} banner`} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex flex-col md:flex-row items-start -mt-20 md:-mt-24">
             <div className="flex-shrink-0">
-               <img className="h-32 w-32 md:h-40 md:w-40 rounded-full object-cover border-4 border-white dark:border-slate-800 bg-white dark:bg-slate-700 shadow-lg" src={stall.logoUrl} alt={`${stall.name} logo`} />
+               <img className="h-32 w-32 md:h-40 md:w-40 rounded-full object-cover border-4 border-white dark:border-slate-800 bg-white dark:bg-slate-700 shadow-lg" src={stall.logo_url} alt={`${stall.name} logo`} />
             </div>
             <div className="mt-4 md:mt-20 md:ml-6 text-brand-dark dark:text-brand-light">
               <h1 className="text-2xl md:text-4xl font-bold">{stall.name}</h1>
@@ -147,11 +141,10 @@ const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, 
               </button>
               {!isOwnStall && (
                 <button 
-                  onClick={() => setPartnershipModalOpen(true)}
-                  disabled={!!existingProposal}
+                  onClick={() => { if (currentUser?.stallId) setPartnershipModalOpen(true); else if (currentUser) { alert("You must have a stall to propose a partnership."); onNavigate('create-stall'); } else { alert("Please log in to propose a partnership."); onNavigate('login'); } }}
                   className="bg-brand-blue text-white font-semibold py-2 px-4 rounded-full flex items-center gap-2 hover:bg-opacity-90 transition-colors shadow-md disabled:bg-brand-secondary disabled:cursor-not-allowed">
                   <Icon name="briefcase" className="h-5 w-5" />
-                  {existingProposal ? 'Proposal Sent' : 'Propose Partnership'}
+                  {'Propose Partnership'}
                 </button>
               )}
             </div>
@@ -182,11 +175,11 @@ const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUserStall, 
         </div>
       </main>
       <Footer onNavigate={onNavigate}/>
-      {!isOwnStall && (
+      {!isOwnStall && currentUser?.stallId && (
         <PartnershipModal 
             isOpen={isPartnershipModalOpen}
             onClose={() => setPartnershipModalOpen(false)}
-            proposerStall={currentUserStall}
+            proposerStallId={currentUser.stallId}
             recipientStall={stall}
             onSubmit={handlePropose}
         />

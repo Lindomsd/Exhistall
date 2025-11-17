@@ -1,11 +1,14 @@
-
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
+import type { User } from '../types';
 
 interface CategoriesPageProps {
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const categories = [
@@ -19,10 +22,10 @@ const categories = [
     { name: 'Automotive', icon: 'truck' },
 ];
 
-const CategoriesPage: React.FC<CategoriesPageProps> = ({ onNavigate }) => {
+const CategoriesPage: React.FC<CategoriesPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl font-extrabold text-center mb-12">Browse Categories</h1>

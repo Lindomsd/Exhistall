@@ -1,6 +1,5 @@
-
 import React from 'react';
-import type { Stall } from '../types';
+import type { Stall, User } from '../types';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import StallCard from '../components/StallCard';
@@ -10,6 +9,9 @@ interface HomePageProps {
   stalls: Stall[];
   onStallClick: (stall: Stall) => void;
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const categories = [
@@ -22,12 +24,12 @@ const categories = [
 ];
 
 
-const HomePage: React.FC<HomePageProps> = ({ stalls, onStallClick, onNavigate }) => {
+const HomePage: React.FC<HomePageProps> = ({ stalls, onStallClick, onNavigate, onSearch, currentUser, onLogout }) => {
   const featuredStalls = stalls.filter(stall => stall.featured);
 
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main>
         {/* Hero Section */}
         <div className="bg-brand-blue">

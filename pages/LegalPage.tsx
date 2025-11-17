@@ -1,10 +1,14 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import type { User } from '../types';
 
 interface LegalPageProps {
   pageType: 'terms' | 'privacy' | 'claim';
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const legalContent = {
@@ -65,12 +69,12 @@ const legalContent = {
   }
 };
 
-const LegalPage: React.FC<LegalPageProps> = ({ pageType, onNavigate }) => {
+const LegalPage: React.FC<LegalPageProps> = ({ pageType, onNavigate, onSearch, currentUser, onLogout }) => {
   const { title, content } = legalContent[pageType];
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="flex-grow bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-3xl mx-auto">

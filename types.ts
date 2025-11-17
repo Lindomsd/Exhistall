@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -24,11 +23,12 @@ export interface GalleryItem {
 
 export interface Stall {
   id: string;
+  ownerId: string;
   name: string;
   slogan: string;
   category: string;
-  logoUrl: string;
-  bannerUrl: string;
+  logo_url: string;
+  banner_url: string;
   description: string;
   mission: string;
   products: Product[];
@@ -45,13 +45,15 @@ export interface Stall {
     website: string;
   };
   featured?: boolean;
-  status: 'active' | 'suspended' | 'banned';
+  status: 'active' | 'suspended' | 'banned' | 'pending_review';
 }
 
 export interface PartnershipRequest {
     id: string;
-    proposerStall: Stall;
-    recipientStall: Stall;
+    proposerStallId: string;
+    recipientStallId: string;
+    proposerStall?: Stall; // Denormalized for easier display
+    recipientStall?: Stall; // Denormalized for easier display
     message: string;
     status: 'pending' | 'accepted' | 'declined';
     date: string;
@@ -97,8 +99,9 @@ export interface Exhibition {
 
 export interface User {
   id: string;
-  email: string;
-  password?: string; // Should be hashed in a real app
+  email?: string;
+  password?: string; // For mock auth
   role: 'admin' | 'user';
   name: string;
+  stallId?: string;
 }

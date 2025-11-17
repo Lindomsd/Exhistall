@@ -3,10 +3,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
 import { mockExhibitions } from '../data/mockData';
-import type { Exhibition } from '../types';
+import type { Exhibition, User } from '../types';
 
 interface ExhibitionsPageProps {
   onNavigate: (page: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
 const ExhibitionCard: React.FC<{ exhibition: Exhibition }> = ({ exhibition }) => (
@@ -15,7 +18,7 @@ const ExhibitionCard: React.FC<{ exhibition: Exhibition }> = ({ exhibition }) =>
     <div className="p-6">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold text-brand-dark dark:text-white">{exhibition.title}</h3>
-        <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+        <span className={`px-3 py-1 text-xs font-bold rounded-full capitalize ${
           exhibition.status === 'upcoming' 
           ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -39,13 +42,13 @@ const ExhibitionCard: React.FC<{ exhibition: Exhibition }> = ({ exhibition }) =>
   </div>
 );
 
-const ExhibitionsPage: React.FC<ExhibitionsPageProps> = ({ onNavigate }) => {
+const ExhibitionsPage: React.FC<ExhibitionsPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
   const upcomingExhibitions = mockExhibitions.filter(e => e.status === 'upcoming');
   const pastExhibitions = mockExhibitions.filter(e => e.status === 'past');
 
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">

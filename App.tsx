@@ -14,26 +14,96 @@ import LegalPage from './pages/LegalPage';
 import NetworkingPage from './pages/NetworkingPage';
 import PricingPage from './pages/PricingPage';
 import LoginPage from './pages/LoginPage';
-import { mockStalls, mockPartnershipRequests, mockUsers } from './data/mockData';
-import type { Stall, PartnershipRequest, User } from './types';
+import StallholderDashboardPage from './pages/StallholderDashboardPage';
+import { api } from './services/api';
+import type { Stall, PartnershipRequest, User, Product } from './types';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedStall, setSelectedStall] = useState<Stall | null>(null);
-  const [stalls, setStalls] = useState<Stall[]>(mockStalls);
-  const [partnershipRequests, setPartnershipRequests] = useState<PartnershipRequest[]>(mockPartnershipRequests);
+  const [stalls, setStalls] = useState<Stall[]>([]);
+  const [allStalls, setAllStalls] = useState<Stall[]>([]); // Includes pending, for admin
+  const [partnershipRequests, setPartnershipRequests] = useState<PartnershipRequest[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  
-  const currentUserStall = stalls[0];
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Stall[] | null>(null);
+  const [currentUserStall, setCurrentUserStall] = useState<Stall | null>(null);
 
-  const handleNavigate = (page: string) => {
-    // If trying to access admin page without being an admin, redirect to login
+  useEffect(() => {
+    const initializeApp = async () => {
+      setIsLoading(true);
+      try {
+        const [fetchedUser, fetchedStalls] = await Promise.all([
+          api.getCurrentUser(),
+          api.getStalls()
+        ]);
+        setCurrentUser(fetchedUser);
+        setStalls(fetchedStalls);
+        
+        if (fetchedUser) {
+          await fetchDataForUser(fetchedUser);
+        }
+
+      } catch (error) {
+        console.error("Failed to initialize app data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeApp();
+  }, []);
+
+  const fetchDataForUser = async (user: User) => {
+    if (user.role === 'admin') {
+      const [adminStalls, allUsers] = await Promise.all([
+          api.getAllStallsForAdmin(),
+          api.getUsers(),
+      ]);
+      setAllStalls(adminStalls);
+      setUsers(allUsers);
+    }
+    if (user.stallId) {
+      const [userStall, userPartnerships] = await Promise.all([
+        api.getStallById(user.stallId),
+        api.getPartnershipRequestsForStall(user.stallId)
+      ]);
+      setCurrentUserStall(userStall);
+      setPartnershipRequests(userPartnerships);
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setSearchResults(null);
+      setCurrentPage('home');
+      return;
+    }
+    const results = stalls.filter(
+      stall =>
+        stall.name.toLowerCase().includes(query.toLowerCase()) ||
+        stall.category.toLowerCase().includes(query.toLowerCase())
+    );
+    setSearchResults(results);
+    setCurrentPage('searchResults');
+    window.scrollTo(0, 0);
+  };
+
+  const handleNavigate = (page: string, stallId?: string) => {
     if (page === 'admin' && currentUser?.role !== 'admin') {
       setCurrentPage('login');
       return;
     }
-    setCurrentPage(page);
-    setSelectedStall(null);
+     if (page === 'stall' && stallId) {
+      const stall = allStalls.find(s => s.id === stallId) || stalls.find(s => s.id === stallId);
+      if(stall) handleSelectStall(stall);
+    } else {
+      setCurrentPage(page);
+      setSelectedStall(null);
+    }
     window.scrollTo(0, 0);
   };
 
@@ -49,64 +119,170 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
-  const handleProposePartnership = (recipientStall: Stall, message: string) => {
-    const newRequest: PartnershipRequest = {
-      id: `pr-${Date.now()}`,
-      proposerStall: currentUserStall,
-      recipientStall,
-      message,
-      status: 'pending',
-      date: new Date().toISOString().split('T')[0],
-    };
+  const handleProposePartnership = async (recipientStall: Stall, message: string) => {
+    if (!currentUserStall) {
+      alert("You must have a stall to propose a partnership.");
+      return;
+    }
+    const newRequest = await api.proposePartnership(currentUserStall, recipientStall, message);
     setPartnershipRequests(prev => [...prev, newRequest]);
   };
   
-  const handleLogin = (email: string, password: string): boolean => {
-    const user = mockUsers.find(u => u.email === email && u.password === password);
-    if (user && user.role === 'admin') {
+  const handleLogin = async (email: string, password: string): Promise<boolean> => {
+    const user = await api.login(email, password);
+    if (user) {
       setCurrentUser(user);
-      handleNavigate('admin');
+      await fetchDataForUser(user);
+       if (user.role === 'admin') {
+        handleNavigate('admin');
+      } else if (user.stallId) {
+        handleNavigate('stallholder-dashboard');
+      }
+      else {
+        handleNavigate('home');
+      }
       return true;
     }
     return false;
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await api.logout();
     setCurrentUser(null);
+    setCurrentUserStall(null);
+    setPartnershipRequests([]);
+    setAllStalls([]);
+    setUsers([]);
     handleNavigate('home');
   };
 
-  const handleUpdateStallStatus = (stallId: string, status: 'active' | 'suspended' | 'banned') => {
-    setStalls(prevStalls => 
-      prevStalls.map(stall => 
-        stall.id === stallId ? { ...stall, status } : stall
-      )
-    );
+  const handleUpdateStallStatus = async (stallId: string, status: Stall['status']) => {
+    const updatedStall = await api.updateStallStatus(stallId, status);
+    if (updatedStall) {
+      setAllStalls(prevStalls => 
+        prevStalls.map(s => s.id === stallId ? updatedStall : s)
+      );
+      // also update the public stalls if it becomes active
+      if(updatedStall.status === 'active') {
+        setStalls(prev => {
+            const exists = prev.some(s => s.id === stallId);
+            return exists ? prev.map(s => s.id === stallId ? updatedStall : s) : [...prev, updatedStall];
+        });
+      } else {
+         setStalls(prev => prev.filter(s => s.id !== stallId));
+      }
+      alert(`Stall status updated to ${status}.`);
+    } else {
+       alert('Failed to update stall status.');
+    }
   };
+  
+  const handleCreateStall = async (stallData: Omit<Stall, 'id' | 'ownerId' | 'status'>) => {
+      const newStall = await api.createStall(stallData);
+      if (newStall) {
+          setAllStalls(prev => [...prev, newStall]);
+          // This also updates currentUser in the API service
+          const updatedUser = await api.getCurrentUser();
+          if (updatedUser) {
+            setCurrentUser(updatedUser);
+            await fetchDataForUser(updatedUser);
+          }
+      }
+  }
+
+  const handleUpdateStall = async (stallId: string, updates: Partial<Stall>) => {
+    const updatedStall = await api.updateStall(stallId, updates);
+    if(updatedStall) {
+      setCurrentUserStall(updatedStall);
+      setAllStalls(prev => prev.map(s => s.id === stallId ? updatedStall : s));
+      setStalls(prev => prev.map(s => s.id === stallId ? updatedStall : s));
+    }
+  }
+
+  const handleAddProduct = async (stallId: string, productData: Omit<Product, 'id'>) => {
+    const updatedStall = await api.addProduct(stallId, productData);
+    if(updatedStall) setCurrentUserStall(updatedStall);
+  }
+
+  const handleUpdateProduct = async (stallId: string, productId: string, updates: Partial<Product>) => {
+    const updatedStall = await api.updateProduct(stallId, productId, updates);
+    if(updatedStall) setCurrentUserStall(updatedStall);
+  }
+
+  const handleDeleteProduct = async (stallId: string, productId: string) => {
+    const updatedStall = await api.deleteProduct(stallId, productId);
+    if(updatedStall) setCurrentUserStall(updatedStall);
+  }
+
+  const handleUpdatePartnershipStatus = async (requestId: string, status: 'accepted' | 'declined') => {
+    const updatedRequest = await api.updatePartnershipRequestStatus(requestId, status);
+    if (updatedRequest) {
+      setPartnershipRequests(prev => prev.map(r => r.id === requestId ? updatedRequest : r));
+    }
+  }
 
   useEffect(() => {
     document.body.className = 'bg-brand-light dark:bg-brand-dark text-brand-dark dark:text-brand-light';
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-light dark:bg-brand-dark">
+        <div className="text-center">
+          <p className="text-xl font-semibold">Loading Exhistalls...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderPage = () => {
     if (currentPage === 'login') {
       return <LoginPage onLogin={handleLogin} onNavigate={handleNavigate} />;
     }
     
-    if (currentPage === 'admin') {
-      if (currentUser?.role === 'admin') {
-        return <AdminDashboardPage 
-          stalls={stalls} 
-          partnershipRequests={partnershipRequests} 
-          onNavigate={handleNavigate} 
-          currentUser={currentUser} 
+    if (currentPage === 'admin' && currentUser?.role === 'admin') {
+      return <AdminDashboardPage 
+        stalls={allStalls} 
+        users={users}
+        onNavigate={handleNavigate} 
+        currentUser={currentUser} 
+        onLogout={handleLogout}
+        onUpdateStallStatus={handleUpdateStallStatus}
+        onSearch={handleSearch}
+      />;
+    }
+    
+    if (currentPage === 'stallholder-dashboard' && currentUserStall) {
+      return (
+        <StallholderDashboardPage 
+          stall={currentUserStall}
+          partnershipRequests={partnershipRequests}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
           onLogout={handleLogout}
-          onUpdateStallStatus={handleUpdateStallStatus}
-        />;
-      } else {
-        // This is a fallback, handleNavigate should prevent this.
-        return <LoginPage onLogin={handleLogin} onNavigate={handleNavigate} initialError="You must be logged in to view this page." />;
-      }
+          onSearch={handleSearch}
+          onUpdateStall={handleUpdateStall}
+          onAddProduct={handleAddProduct}
+          onUpdateProduct={handleUpdateProduct}
+          onDeleteProduct={handleDeleteProduct}
+          onUpdatePartnershipStatus={handleUpdatePartnershipStatus}
+        />
+      );
+    }
+    
+    if (currentPage === 'searchResults') {
+      return (
+        <NetworkingPage
+          stalls={searchResults || []}
+          onStallClick={handleSelectStall}
+          onNavigate={handleNavigate}
+          onSearch={handleSearch}
+          pageTitle="Search Results"
+          searchQuery={searchQuery}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
+      );
     }
 
     if (currentPage === 'stall' && selectedStall) {
@@ -114,47 +290,47 @@ const App: React.FC = () => {
         <StallPage 
           stall={selectedStall} 
           onBack={handleGoBack} 
-          currentUserStall={currentUserStall}
-          partnershipRequests={partnershipRequests}
+          currentUser={currentUser}
           onProposePartnership={handleProposePartnership}
           onNavigate={handleNavigate}
+          onSearch={handleSearch}
+          onLogout={handleLogout}
         />
       );
     }
 
     switch (currentPage) {
       case 'home':
-        return <HomePage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} />;
+        return <HomePage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout} />;
       case 'categories':
-        return <CategoriesPage onNavigate={handleNavigate} />;
+        return <CategoriesPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'marketplace':
-        return <MarketplacePage stalls={stalls} onNavigate={handleNavigate} />;
+        return <MarketplacePage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'create-stall':
-        return <CreateStallPage onNavigate={handleNavigate} />;
+        return <CreateStallPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout} onCreateStall={handleCreateStall} />;
       case 'networking':
-        return <NetworkingPage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} />;
+        return <NetworkingPage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'exhibitions':
-        return <ExhibitionsPage onNavigate={handleNavigate} />;
+        return <ExhibitionsPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'pricing':
-        return <PricingPage onNavigate={handleNavigate} />;
+        return <PricingPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'help':
       case 'guides':
-        return <HelpCenterPage onNavigate={handleNavigate} />;
+        return <HelpCenterPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'about':
-        return <AboutPage onNavigate={handleNavigate} />;
+        return <AboutPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'blog':
-        return <BlogPage onNavigate={handleNavigate} />;
+        return <BlogPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'jobs':
-        return <JobsPage onNavigate={handleNavigate} />;
+        return <JobsPage onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'claim':
-        return <LegalPage pageType="claim" onNavigate={handleNavigate} />;
+        return <LegalPage pageType="claim" onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'privacy':
-        return <LegalPage pageType="privacy" onNavigate={handleNavigate} />;
+        return <LegalPage pageType="privacy" onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       case 'terms':
-        return <LegalPage pageType="terms" onNavigate={handleNavigate} />;
+        return <LegalPage pageType="terms" onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
       default:
-        // Fallback to home for unknown pages
-        return <HomePage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} />;
+        return <HomePage stalls={stalls} onStallClick={handleSelectStall} onNavigate={handleNavigate} onSearch={handleSearch} currentUser={currentUser} onLogout={handleLogout}/>;
     }
   };
 

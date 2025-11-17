@@ -1,16 +1,20 @@
-
 import React, { useState, useMemo } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
-import type { Stall } from '../types';
+import StallCard from '../components/StallCard';
+import type { Stall, User } from '../types';
 
 interface MarketplacePageProps {
   stalls: Stall[];
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, stallId?: string) => void;
+  onStallClick: (stall: Stall) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
 }
 
-const MarketplacePage: React.FC<MarketplacePageProps> = ({ stalls, onNavigate }) => {
+const MarketplacePage: React.FC<MarketplacePageProps> = ({ stalls, onNavigate, onSearch, currentUser, onLogout, onStallClick }) => {
   const allProducts = useMemo(() => stalls.flatMap(stall => stall.products), [stalls]);
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
@@ -30,15 +34,15 @@ const MarketplacePage: React.FC<MarketplacePageProps> = ({ stalls, onNavigate })
 
   return (
     <>
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl font-extrabold text-center mb-4">Marketplace</h1>
           <p className="text-center text-brand-secondary dark:text-slate-400 mb-10">Discover unique products from our talented stallholders.</p>
           
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid lg:grid-cols-4 gap-8">
             {/* Filters */}
-            <aside className="md:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg h-fit sticky top-24">
+            <aside className="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg h-fit sticky top-24">
               <h2 className="text-xl font-bold mb-4">Filters</h2>
               <div className="space-y-6">
                 <div>
@@ -82,11 +86,16 @@ const MarketplacePage: React.FC<MarketplacePageProps> = ({ stalls, onNavigate })
             </aside>
 
             {/* Product Grid */}
-            <div className="md:col-span-3">
+            <div className="lg:col-span-3">
               {filteredProducts.length > 0 ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
+                    <div key={product.id} onClick={() => {
+                        const stall = stalls.find(s => s.products.some(p => p.id === product.id));
+                        if(stall) onStallClick(stall);
+                    }} className="cursor-pointer">
+                        <ProductCard product={product} />
+                    </div>
                   ))}
                 </div>
               ) : (
