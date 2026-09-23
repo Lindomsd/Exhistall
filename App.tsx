@@ -15,6 +15,7 @@ import NetworkingPage from './pages/NetworkingPage';
 import PricingPage from './pages/PricingPage';
 import LoginPage from './pages/LoginPage';
 import StallholderDashboardPage from './pages/StallholderDashboardPage';
+import AdminMfaPage from './pages/AdminMfaPage';
 import { api } from './services/api';
 import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem } from './types';
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Stall[] | null>(null);
   const [currentUserStall, setCurrentUserStall] = useState<Stall | null>(null);
+  const [adminMfaVerified, setAdminMfaVerified] = useState(false);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -42,7 +44,11 @@ const App: React.FC = () => {
         setCurrentUser(fetchedUser);
         setStalls(fetchedStalls);
         
-        if (fetchedUser) {
+        if (fetchedUser?.role === 'admin') {
+          const mfaState = await api.getAdminMfaState();
+          setAdminMfaVerified(mfaState.verified);
+          if (mfaState.verified) await fetchDataForUser(fetchedUser);
+        } else if (fetchedUser) {
           await fetchDataForUser(fetchedUser);
         }
 
@@ -97,6 +103,10 @@ const App: React.FC = () => {
       setCurrentPage('login');
       return;
     }
+    if (page === 'admin' && !adminMfaVerified) {
+      setCurrentPage('admin-mfa');
+      return;
+    }
      if (page === 'stall' && stallId) {
       const stall = allStalls.find(s => s.id === stallId) || stalls.find(s => s.id === stallId);
       if(stall) handleSelectStall(stall);
@@ -138,13 +148,14 @@ const App: React.FC = () => {
     }
     if (user) {
       setCurrentUser(user);
-      await fetchDataForUser(user);
-       if (user.role === 'admin') {
-        handleNavigate('admin');
+      if (user.role === 'admin') {
+        setAdminMfaVerified(false);
+        handleNavigate('admin-mfa');
       } else if (user.stallId) {
+        await fetchDataForUser(user);
         handleNavigate('stallholder-dashboard');
-      }
-      else {
+      } else {
+        await fetchDataForUser(user);
         handleNavigate('home');
       }
       return true;
@@ -174,7 +185,15 @@ const App: React.FC = () => {
     setPartnershipRequests([]);
     setAllStalls([]);
     setUsers([]);
+    setAdminMfaVerified(false);
     handleNavigate('home');
+  };
+
+  const handleAdminMfaVerified = async () => {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    setAdminMfaVerified(true);
+    await fetchDataForUser(currentUser);
+    handleNavigate('admin');
   };
 
   const handleUpdateStallStatus = async (stallId: string, status: Stall['status']) => {
@@ -192,7 +211,7 @@ const App: React.FC = () => {
       } else {
          setStalls(prev => prev.filter(s => s.id !== stallId));
       }
-      alert(`Stall status updated to ${status}.`);
+      alert(`Stall status updated to \${status}.`);
     } else {
        alert('Failed to update stall status.');
     }
@@ -277,7 +296,11 @@ const App: React.FC = () => {
       return <LoginPage onLogin={handleLogin} onSignUp={handleSignUp} onNavigate={handleNavigate} />;
     }
     
-    if (currentPage === 'admin' && currentUser?.role === 'admin') {
+    if (currentPage === 'admin-mfa' && currentUser?.role === 'admin') {
+      return <AdminMfaPage currentUser={currentUser} onLogout={handleLogout} onVerified={handleAdminMfaVerified} onNavigate={handleNavigate} />;
+    }
+
+    if (currentPage === 'admin' && currentUser?.role === 'admin' && adminMfaVerified) {
       return <AdminDashboardPage 
         stalls={allStalls} 
         users={users}

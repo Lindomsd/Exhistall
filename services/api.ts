@@ -17,6 +17,12 @@ type DbPartnership = {
   message: string; status: PartnershipRequest['status']; created_at: string;
 };
 
+export type AdminMfaState = {
+  enrolled: boolean;
+  verified: boolean;
+  factorId?: string;
+};
+
 const stallSelect = '*, products(*), gallery_items(*), reviews(*)';
 
 const toProduct = (row: DbProduct): Product => ({
@@ -124,6 +130,32 @@ const stallPayload = (stall: Partial<Stall>) => ({
 });
 
 export const api = {
+  async getAdminMfaState(): Promise<AdminMfaState> {
+    const client = requireSupabase();
+    const [{ data: assurance, error: assuranceError }, { data: factors, error: factorsError }] = await Promise.all([
+      client.auth.mfa.getAuthenticatorAssuranceLevel(),
+      client.auth.mfa.listFactors(),
+    ]);
+    if (assuranceError) throw assuranceError;
+    if (factorsError) throw factorsError;
+    const factor = factors.totp.find((item) => item.status === 'verified');
+    return { enrolled: Boolean(factor), verified: assurance.currentLevel === 'aal2', factorId: factor?.id };
+  },
+
+  async enrolAdminMfa(): Promise<{ factorId: string; qrCode: string }> {
+    const { data, error } = await requireSupabase().auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Exhistall administrator' });
+    if (error) throw error;
+    return { factorId: data.id, qrCode: data.totp.qr_code };
+  },
+
+  async verifyAdminMfa(factorId: string, code: string): Promise<void> {
+    const client = requireSupabase();
+    const { data: challenge, error: challengeError } = await client.auth.mfa.challenge({ factorId });
+    if (challengeError) throw challengeError;
+    const { error: verifyError } = await client.auth.mfa.verify({ factorId, challengeId: challenge.id, code });
+    if (verifyError) throw verifyError;
+  },
+
   async getStalls(): Promise<Stall[]> {
     const client = requireSupabase();
     const { data, error } = await client.from('stalls').select(stallSelect).eq('status', 'active').order('featured', { ascending: false }).order('created_at', { ascending: false });
@@ -224,7 +256,7 @@ export const api = {
     const { data, error } = await client
       .from('partnership_requests')
       .select('*')
-      .or(`proposer_stall_id.eq.${stallId},recipient_stall_id.eq.${stallId}`)
+      .or(`proposer_stall_id.eq.\${stallId},recipient_stall_id.eq.\${stallId}`)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return Promise.all(((data ?? []) as DbPartnership[]).map(toPartnership));
