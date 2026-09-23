@@ -65,8 +65,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignUp, onNavigate }) 
             </div>
 
             <div className="mb-6 grid grid-cols-2 rounded-lg bg-slate-100 p-1 text-sm font-bold dark:bg-slate-700">
-              <button type="button" onClick={() => switchMode('sign-in')} className={`rounded-md px-3 py-2 transition \${mode === 'sign-in' ? 'bg-white text-brand-blue shadow dark:bg-slate-800 dark:text-brand-gold' : 'text-brand-secondary dark:text-slate-300'}`}>Sign in</button>
-              <button type="button" onClick={() => switchMode('register')} className={`rounded-md px-3 py-2 transition \${mode === 'register' ? 'bg-white text-brand-blue shadow dark:bg-slate-800 dark:text-brand-gold' : 'text-brand-secondary dark:text-slate-300'}`}>Create account</button>
+              <button type="button" onClick={() => switchMode('sign-in')} className={`rounded-md px-3 py-2 transition ${mode === 'sign-in' ? 'bg-white text-brand-blue shadow dark:bg-slate-800 dark:text-brand-gold' : 'text-brand-secondary dark:text-slate-300'}`}>Sign in</button>
+              <button type="button" onClick={() => switchMode('register')} className={`rounded-md px-3 py-2 transition ${mode === 'register' ? 'bg-white text-brand-blue shadow dark:bg-slate-800 dark:text-brand-gold' : 'text-brand-secondary dark:text-slate-300'}`}>Create account</button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
