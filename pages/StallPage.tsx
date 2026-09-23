@@ -1,191 +1,41 @@
 import React, { useState } from 'react';
-import type { Stall, Review, User } from '../types';
+import type { Stall, User } from '../types';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import PartnershipModal from '../components/PartnershipModal';
 import { Icon } from '../components/Icon';
 
-interface StallPageProps {
-  stall: Stall;
-  onBack: () => void;
-  currentUser: User | null;
-  onProposePartnership: (recipientStall: Stall, message: string) => void;
-  onNavigate: (page: string) => void;
-  onSearch: (query: string) => void;
-  onLogout: () => void;
-}
+interface StallPageProps { stall: Stall; onBack: () => void; currentUser: User | null; onProposePartnership: (recipientStall: Stall, message: string) => void; onNavigate: (page: string) => void; onSearch: (query: string) => void; onLogout: () => void; }
+
+const externalUrl = (value: string) => /^https?:\/\//i.test(value) ? value : `https://${value}`;
 
 const StallPage: React.FC<StallPageProps> = ({ stall, onBack, currentUser, onProposePartnership, onNavigate, onSearch, onLogout }) => {
   const [activeTab, setActiveTab] = useState('about');
   const [isPartnershipModalOpen, setPartnershipModalOpen] = useState(false);
-
-  const renderStars = (rating: number) => {
-    return Array(5).fill(0).map((_, i) => (
-        <Icon key={i} name="star" className={`h-5 w-5 ${i < rating ? 'text-brand-gold' : 'text-gray-300 dark:text-gray-600'}`} />
-    ));
-  };
-
-  const tabs = [
-    { id: 'about', label: 'About' },
-    { id: 'products', label: `Products (${stall.products.length})` },
-    { id: 'gallery', label: `Gallery (${stall.gallery.length})` },
-    { id: 'reviews', label: `Reviews (${stall.reviews.length})` },
-  ];
-
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const rating = stall.reviews.length ? (stall.reviews.reduce((total, review) => total + review.rating, 0) / stall.reviews.length).toFixed(1) : null;
+  const tabs = [{ id: 'about', label: 'About' }, { id: 'products', label: `Products (${stall.products.length})` }, { id: 'gallery', label: `Gallery (${stall.gallery.length})` }, { id: 'reviews', label: `Reviews (${stall.reviews.length})` }];
   const isOwnStall = !!currentUser && currentUser.stallId === stall.id;
 
-  const handlePropose = (message: string) => {
-    onProposePartnership(stall, message);
+  const renderStars = (value: number) => Array.from({ length: 5 }, (_, index) => <Icon key={index} name="star" className={`h-5 w-5 ${index < value ? 'text-brand-gold' : 'text-gray-300 dark:text-gray-600'}`} />);
+  const openPartnership = () => {
+    if (currentUser?.stallId) setPartnershipModalOpen(true);
+    else if (currentUser) { alert('You must have a stall to propose a partnership.'); onNavigate('create-stall'); }
+    else { alert('Please log in to propose a partnership.'); onNavigate('login'); }
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'products':
-        return (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {stall.products.map(product => <ProductCard key={product.id} product={product} />)}
-          </div>
-        );
-      case 'gallery':
-        return (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {stall.gallery.map(item => (
-              <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer">
-                <img src={item.type === 'image' ? item.url : item.thumbnailUrl} alt="Gallery item" className="w-full h-full object-cover" />
-                {item.type === 'video' && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Icon name="play" className="h-12 w-12 text-white" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        );
-      case 'reviews':
-        return (
-          <div className="space-y-6 max-w-3xl mx-auto">
-            {stall.reviews.map(review => (
-              <div key={review.id} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">{review.author}</span>
-                  <div className="flex items-center">{renderStars(review.rating)}</div>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{new Date(review.date).toLocaleDateString()}</p>
-                <p className="mt-2 text-brand-secondary dark:text-slate-300">{review.comment}</p>
-              </div>
-            ))}
-            {stall.reviews.length === 0 && <p className="text-center text-brand-secondary dark:text-slate-400 py-8">No reviews yet.</p>}
-          </div>
-        );
-      case 'about':
-      default:
-        return (
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
-              <h3 className="text-xl font-bold mb-2">About {stall.name}</h3>
-              <p className="whitespace-pre-wrap dark:text-slate-300 leading-relaxed">{stall.description}</p>
-              <h3 className="text-xl font-bold mt-6 mb-2">Our Mission</h3>
-              <p className="whitespace-pre-wrap dark:text-slate-300 leading-relaxed">{stall.mission}</p>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-4">Contact & Location</h3>
-              <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm space-y-4">
-                <div className="flex items-start gap-3">
-                    <Icon name="location" className="h-5 w-5 text-brand-blue dark:text-brand-gold flex-shrink-0 mt-1"/>
-                    <span className="text-sm">{stall.location.address}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Icon name="phone" className="h-5 w-5 text-brand-blue dark:text-brand-gold flex-shrink-0"/>
-                    <a href={`tel:${stall.contact.phone}`} className="text-sm hover:underline">{stall.contact.phone}</a>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Icon name="email" className="h-5 w-5 text-brand-blue dark:text-brand-gold flex-shrink-0"/>
-                    <a href={`mailto:${stall.contact.email}`} className="text-sm hover:underline">{stall.contact.email}</a>
-                </div>
-                 <div className="flex items-center gap-3">
-                    <Icon name="website" className="h-5 w-5 text-brand-blue dark:text-brand-gold flex-shrink-0"/>
-                    <a href={`https://${stall.contact.website}`} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline">{stall.contact.website}</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-    }
+  const tabContent = () => {
+    if (activeTab === 'products') return stall.products.length ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{stall.products.map((product) => <ProductCard key={product.id} product={product} />)}</div> : <EmptyState title="No products listed yet" description="Check back soon, or use the contact details to ask about this exhibitor’s offering." />;
+    if (activeTab === 'gallery') return stall.gallery.length ? <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">{stall.gallery.map((item) => { const image = item.type === 'image' ? item.url : item.thumbnailUrl || item.url; return <button key={item.id} type="button" onClick={() => setSelectedImage(image)} className="group relative aspect-square overflow-hidden rounded-lg bg-slate-200 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/40 dark:bg-slate-700 dark:focus-visible:ring-brand-gold/40"><img src={image} alt={`${stall.name} gallery item`} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />{item.type === 'video' && <span className="absolute inset-0 flex items-center justify-center bg-black/45"><Icon name="play" className="h-12 w-12 text-white" /></span>}</button>; })}</div> : <EmptyState title="Gallery coming soon" description="This exhibitor has not added photos yet." />;
+    if (activeTab === 'reviews') return <div className="mx-auto max-w-3xl space-y-6">{stall.reviews.map((review) => <article key={review.id} className="rounded-lg bg-white p-4 shadow-sm dark:bg-slate-800"><div className="flex items-center justify-between gap-4"><span className="font-semibold">{review.author}</span><div className="flex">{renderStars(review.rating)}</div></div><p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{new Date(review.date).toLocaleDateString()}</p><p className="mt-2 text-brand-secondary dark:text-slate-300">{review.comment}</p></article>)}{!stall.reviews.length && <EmptyState title="No reviews yet" description="Be the first visitor to find this stall." />}</div>;
+    return <div className="grid gap-8 md:grid-cols-3"><div className="md:col-span-2"><h2 className="text-xl font-bold">About {stall.name}</h2><p className="mt-2 whitespace-pre-wrap leading-relaxed dark:text-slate-300">{stall.description || 'This exhibitor has not added a description yet.'}</p>{stall.mission && <><h2 className="mt-7 text-xl font-bold">Our mission</h2><p className="mt-2 whitespace-pre-wrap leading-relaxed dark:text-slate-300">{stall.mission}</p></>}</div><aside><h2 className="mb-4 text-xl font-bold">Contact & location</h2><div className="space-y-4 rounded-lg bg-white p-4 shadow-sm dark:bg-slate-800"><ContactRow icon="location" text={stall.location.address || 'Location on request'} />{stall.contact.phone && <ContactRow icon="phone" text={stall.contact.phone} href={`tel:${stall.contact.phone}`} />}{stall.contact.email && <ContactRow icon="email" text={stall.contact.email} href={`mailto:${stall.contact.email}`} />}{stall.contact.website && <ContactRow icon="website" text={stall.contact.website} href={externalUrl(stall.contact.website)} external />}</div></aside></div>;
   };
 
-
-  return (
-    <>
-      <Header onBack={onBack} onNavigate={onNavigate} currentUser={currentUser} onLogout={onLogout} onSearch={onSearch} />
-      <main className="bg-brand-light dark:bg-brand-dark pb-16">
-        {/* Stall Header */}
-        <div className="relative h-48 md:h-64 bg-gray-200">
-          <img src={stall.banner_url} alt={`${stall.name} banner`} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        </div>
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex flex-col md:flex-row items-start -mt-20 md:-mt-24">
-            <div className="flex-shrink-0">
-               <img className="h-32 w-32 md:h-40 md:w-40 rounded-full object-cover border-4 border-white dark:border-slate-800 bg-white dark:bg-slate-700 shadow-lg" src={stall.logo_url} alt={`${stall.name} logo`} />
-            </div>
-            <div className="mt-4 md:mt-20 md:ml-6 text-brand-dark dark:text-brand-light">
-              <h1 className="text-2xl md:text-4xl font-bold">{stall.name}</h1>
-              <p className="text-md text-brand-secondary dark:text-slate-300 mt-1">{stall.slogan}</p>
-            </div>
-            <div className="w-full md:w-auto mt-4 md:mt-20 md:ml-auto flex items-center gap-2 flex-wrap justify-start md:justify-end">
-              <button className="bg-white dark:bg-slate-700 text-brand-dark dark:text-white font-semibold py-2 px-4 rounded-full flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors shadow-md">
-                <Icon name="message" className="h-5 w-5" />
-                Message
-              </button>
-              {!isOwnStall && (
-                <button 
-                  onClick={() => { if (currentUser?.stallId) setPartnershipModalOpen(true); else if (currentUser) { alert("You must have a stall to propose a partnership."); onNavigate('create-stall'); } else { alert("Please log in to propose a partnership."); onNavigate('login'); } }}
-                  className="bg-brand-blue text-white font-semibold py-2 px-4 rounded-full flex items-center gap-2 hover:bg-opacity-90 transition-colors shadow-md disabled:bg-brand-secondary disabled:cursor-not-allowed">
-                  <Icon name="briefcase" className="h-5 w-5" />
-                  {'Propose Partnership'}
-                </button>
-              )}
-            </div>
-          </div>
-          
-          {/* Tabs */}
-          <div className="mt-8 border-b border-gray-300 dark:border-slate-700">
-            <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`${
-                    activeTab === tab.id
-                      ? 'border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold'
-                      : 'border-transparent text-brand-secondary dark:text-slate-400 hover:text-brand-dark dark:hover:text-brand-light hover:border-gray-400 dark:hover:border-slate-500'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors focus:outline-none`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-          
-          <div className="mt-8">
-            {renderTabContent()}
-          </div>
-        </div>
-      </main>
-      <Footer onNavigate={onNavigate}/>
-      {!isOwnStall && currentUser?.stallId && (
-        <PartnershipModal 
-            isOpen={isPartnershipModalOpen}
-            onClose={() => setPartnershipModalOpen(false)}
-            proposerStallId={currentUser.stallId}
-            recipientStall={stall}
-            onSubmit={handlePropose}
-        />
-      )}
-    </>
-  );
+  return <><Header onBack={onBack} onNavigate={onNavigate} currentUser={currentUser} onLogout={onLogout} onSearch={onSearch} /><main className="bg-brand-light pb-16 dark:bg-brand-dark"><div className="relative h-52 bg-brand-blue/20 md:h-72">{stall.banner_url ? <img src={stall.banner_url} alt={`${stall.name} banner`} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl font-bold text-brand-blue dark:text-brand-gold">{stall.name}</div>}<div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" /></div><div className="container mx-auto px-4 sm:px-6 lg:px-8"><div className="relative -mt-20 flex flex-col items-start md:-mt-24 md:flex-row">{stall.logo_url ? <img className="h-32 w-32 rounded-full border-4 border-white bg-white object-cover shadow-lg dark:border-slate-800 dark:bg-slate-700 md:h-40 md:w-40" src={stall.logo_url} alt={`${stall.name} logo`} /> : <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-white bg-brand-blue text-5xl font-bold text-white shadow-lg dark:border-slate-800 md:h-40 md:w-40">{stall.name.charAt(0).toUpperCase()}</div>}<div className="mt-4 md:ml-6 md:mt-20"><p className="text-sm font-bold uppercase tracking-wider text-brand-blue dark:text-brand-gold">{stall.category}</p><h1 className="text-3xl font-bold md:text-4xl">{stall.name}</h1><p className="mt-1 text-brand-secondary dark:text-slate-300">{stall.slogan}</p>{rating && <p className="mt-2 flex items-center gap-1 text-sm"><Icon name="star" className="h-4 w-4 text-brand-gold" />{rating} from {stall.reviews.length} reviews</p>}</div><div className="mt-5 flex w-full flex-wrap gap-2 md:ml-auto md:mt-20 md:w-auto">{!isOwnStall && <button type="button" onClick={openPartnership} className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-4 py-2 font-semibold text-white shadow-md transition hover:bg-opacity-90"><Icon name="briefcase" className="h-5 w-5" />Propose partnership</button>}</div></div><nav className="mt-8 flex gap-6 overflow-x-auto border-b border-gray-300 dark:border-slate-700" aria-label="Stall sections">{tabs.map((tab) => <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === tab.id ? 'border-brand-blue text-brand-blue dark:border-brand-gold dark:text-brand-gold' : 'border-transparent text-brand-secondary hover:border-gray-400 dark:text-slate-400'}`}>{tab.label}</button>)}</nav><div className="mt-8">{tabContent()}</div></div></main><Footer onNavigate={onNavigate} />{!isOwnStall && currentUser?.stallId && <PartnershipModal isOpen={isPartnershipModalOpen} onClose={() => setPartnershipModalOpen(false)} proposerStallId={currentUser.stallId} recipientStall={stall} onSubmit={(message) => onProposePartnership(stall, message)} />}{selectedImage && <div role="dialog" aria-modal="true" aria-label="Gallery image" className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4" onClick={() => setSelectedImage(null)}><button type="button" aria-label="Close image" className="absolute right-5 top-5 rounded-full bg-white p-2 text-brand-dark" onClick={() => setSelectedImage(null)}><Icon name="x" className="h-6 w-6" /></button><img src={selectedImage} alt={`${stall.name} gallery enlargement`} className="max-h-[85vh] max-w-full rounded-lg object-contain" onClick={(event) => event.stopPropagation()} /></div>}</>;
 };
+
+const ContactRow: React.FC<{ icon: string; text: string; href?: string; external?: boolean }> = ({ icon, text, href, external = false }) => <div className="flex items-start gap-3"><Icon name={icon} className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue dark:text-brand-gold" />{href ? <a href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined} className="break-all text-sm hover:underline">{text}</a> : <span className="text-sm">{text}</span>}</div>;
+const EmptyState: React.FC<{ title: string; description: string }> = ({ title, description }) => <div className="rounded-lg border border-dashed border-gray-300 px-6 py-14 text-center dark:border-slate-600"><h3 className="text-xl font-bold">{title}</h3><p className="mt-2 text-brand-secondary dark:text-slate-400">{description}</p></div>;
 
 export default StallPage;
