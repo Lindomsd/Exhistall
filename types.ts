@@ -6,6 +6,8 @@ export interface Product {
   imageUrl: string;
 }
 
+export type ProductInput = Omit<Product, 'id'>;
+
 export interface Review {
   id:string;
   author: string;
@@ -97,10 +99,11 @@ export interface Exhibition {
   imageUrl: string;
 }
 
+export type StallInput = Omit<Stall, 'id' | 'ownerId' | 'status' | 'featured' | 'products' | 'gallery' | 'reviews'>;
+
 export interface User {
   id: string;
   email?: string;
-  password?: string; // For mock auth
   role: 'admin' | 'user';
   name: string;
   stallId?: string;
