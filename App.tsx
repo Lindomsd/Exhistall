@@ -72,12 +72,15 @@ const App: React.FC = () => {
       setUsers(allUsers);
     }
     if (user.stallId) {
-      const [userStall, userPartnerships] = await Promise.all([
-        api.getStallById(user.stallId),
-        api.getPartnershipRequestsForStall(user.stallId)
-      ]);
+      // A non-critical request must never stop an owner reaching their stall.
+      const userStall = await api.getStallById(user.stallId);
       setCurrentUserStall(userStall);
-      setPartnershipRequests(userPartnerships);
+      try {
+        setPartnershipRequests(await api.getPartnershipRequestsForStall(user.stallId));
+      } catch (error) {
+        console.error('Failed to load partnership requests:', error);
+        setPartnershipRequests([]);
+      }
     }
   };
 
@@ -211,7 +214,7 @@ const App: React.FC = () => {
       } else {
          setStalls(prev => prev.filter(s => s.id !== stallId));
       }
-      alert(`Stall status updated to \${status}.`);
+      alert(`Stall status updated to ${status}.`);
     } else {
        alert('Failed to update stall status.');
     }

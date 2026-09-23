@@ -234,7 +234,7 @@ const StallholderDashboardPage: React.FC<StallholderDashboardPageProps> = (props
                              <p className="text-brand-secondary dark:text-slate-300">Your stall is currently:</p>
                              {getStatusChip()}
                            </div>
-                           {stall.status === 'pending_review' && <p className="mt-2 text-sm text-brand-secondary dark:text-slate-400">An admin is reviewing your submission. You will be notified once it's approved.</p>}
+                           {stall.status === 'pending_review' && <p className="mt-2 text-sm text-brand-secondary dark:text-slate-400">Your stall is not public yet. You can continue editing it, adding products and preparing its gallery while an administrator reviews it.</p>}
                            {stall.status === 'active' && <p className="mt-2 text-sm text-brand-secondary dark:text-slate-400">Your stall is live and visible to everyone on the marketplace!</p>}
                       </div>
                   </div>

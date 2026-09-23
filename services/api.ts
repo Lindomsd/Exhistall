@@ -256,7 +256,7 @@ export const api = {
     const { data, error } = await client
       .from('partnership_requests')
       .select('*')
-      .or(`proposer_stall_id.eq.\${stallId},recipient_stall_id.eq.\${stallId}`)
+      .or(`proposer_stall_id.eq.${stallId},recipient_stall_id.eq.${stallId}`)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return Promise.all(((data ?? []) as DbPartnership[]).map(toPartnership));

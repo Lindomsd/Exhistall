@@ -11,32 +11,64 @@ interface LegalPageProps {
   onLogout: () => void;
 }
 
+const privacyContact = import.meta.env.VITE_PRIVACY_CONTACT_EMAIL?.trim();
+const PrivacyContact: React.FC = () => privacyContact ? (
+  <a className="font-semibold text-brand-blue underline dark:text-brand-gold" href={`mailto:${privacyContact}`}>{privacyContact}</a>
+) : (
+  <span className="font-semibold text-amber-700 dark:text-amber-300">The market operator must publish its privacy contact before public launch.</span>
+);
+
 const legalContent = {
   terms: {
-    title: 'Terms of Service',
+    title: 'Terms of Use',
     content: (
       <>
-        <p>Welcome to Exhistalls. By accessing or using our platform, you agree to be bound by these Terms of Service and our Privacy Policy. Please read them carefully.</p>
-        <h3 className="text-xl font-bold mt-6 mb-2">1. Your Account</h3>
-        <p>You are responsible for maintaining the confidentiality of your account and password and for restricting access to your computer. You agree to accept responsibility for all activities that occur under your account or password.</p>
-        <h3 className="text-xl font-bold mt-6 mb-2">2. Stallholder Responsibilities</h3>
-        <p>As a stallholder, you agree to provide accurate information about yourself and your products. You are responsible for all content you post, including product descriptions, images, and prices. You must handle customer inquiries and orders in a timely and professional manner.</p>
-        <h3 className="text-xl font-bold mt-6 mb-2">3. Prohibited Conduct</h3>
-        <p>You may not use the platform for any illegal or unauthorized purpose. You must not, in the use of the Service, violate any laws in your jurisdiction (including but not limited to copyright laws).</p>
+        <p><strong>Effective 23 September 2026.</strong> Exhistall is a virtual exhibition and market where organisations can present products, services and business information. By using it, you agree to these terms and the Privacy Notice.</p>
+        <h3 className="text-xl font-bold mt-6 mb-2">Accounts and stalls</h3>
+        <p>Keep your account credentials private and provide accurate information. A stallholder may create one stall linked to their account. New stalls are submitted for review; they remain private until an administrator approves them. Approval is not a guarantee of sales, enquiries or continued listing.</p>
+        <h3 className="text-xl font-bold mt-6 mb-2">Your content</h3>
+        <p>You remain responsible for the business details, product and service information, images, prices, links and other material you add. You confirm that you have the rights and permissions needed to publish it and that it is accurate, lawful and not misleading. Do not upload sensitive personal information or content that infringes another person’s rights.</p>
+        <h3 className="text-xl font-bold mt-6 mb-2">Marketplace rules</h3>
+        <p>Do not use Exhistall for unlawful activity, spam, fraud, harmful content, unauthorised advertising, or attempts to interfere with the platform or other users. We may review, suspend, remove or restrict a stall or content where this is reasonably necessary to protect the market, users or legal obligations.</p>
+        <h3 className="text-xl font-bold mt-6 mb-2">Independent businesses</h3>
+        <p>Stallholders are independent organisations. Exhistall does not sell their goods or services, enter into their customer contracts, or guarantee the quality, availability, safety or legality of any listing. Deal directly with the stallholder before making a decision.</p>
+        <h3 className="text-xl font-bold mt-6 mb-2">Availability and changes</h3>
+        <p>We may update, maintain or change the platform and these terms. Where a material change is made, the effective date will be updated. Nothing in these terms excludes rights that cannot lawfully be excluded.</p>
       </>
     ),
   },
   privacy: {
-    title: 'Privacy Policy',
+    title: 'Privacy Notice',
     content: (
       <>
-        <p>Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
-        <h3 className="text-xl font-bold mt-6 mb-2">1. Collection of Your Information</h3>
-        <p>We may collect personal identification information from Users in a variety of ways, including, but not limited to, when Users visit our site, register on the site, place an order, and in connection with other activities, services, features or resources we make available on our Site.</p>
-        <h3 className="text-xl font-bold mt-6 mb-2">2. How We Use Your Information</h3>
-        <p>We may use the information we collect from you to personalize your experience, to improve our website, to process transactions, and to send periodic emails regarding your order or other products and services.</p>
-        <h3 className="text-xl font-bold mt-6 mb-2">3. Sharing Your Personal Information</h3>
-        <p>We do not sell, trade, or rent Users personal identification information to others. We may share generic aggregated demographic information not linked to any personal identification information regarding visitors and users with our business partners for the purposes outlined above.</p>
+        <p><strong>Effective 23 September 2026.</strong> This notice explains how Exhistall processes personal information while operating the virtual market. It is designed around South Africa’s Protection of Personal Information Act (POPIA), but should be reviewed and completed by the market operator before public launch.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Who is responsible</h3>
+        <p>The operator of Exhistall is the responsible party for personal information processed through this platform. Privacy and POPIA requests can be sent to: <PrivacyContact /> The operator must also publish its registered business details and Information Officer details where required.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Information processed</h3>
+        <p>We process account details (name and email address), sign-in and session data, stallholder and business information, public contact details that a stallholder chooses to list, product and service listings, uploaded images, partnership requests, reviews, and technical records needed to secure and operate the service.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Why we use it</h3>
+        <p>We use this information to create and secure accounts; host, moderate and publish stalls; enable stallholder management and business-to-business partnership requests; respond to requests; prevent misuse; and meet legal obligations. We process information only where a lawful justification applies, including providing the service you request, legitimate operational and security interests, consent where required, or compliance with law.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">What is public</h3>
+        <p>Once a stall is approved, its business name, logo, description, category, products, gallery items and any contact details the stallholder entered may be visible to anyone visiting the marketplace. Do not place private or sensitive personal information in a public listing. Pending stalls are visible only to their owner and authorised administrators.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Service providers and international transfers</h3>
+        <p>Exhistall uses hosting, authentication, database and media-storage providers to operate the platform. These providers may process information in countries outside South Africa. The operator must maintain appropriate operator agreements and safeguards for any cross-border processing, as POPIA requires.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Retention and security</h3>
+        <p>We retain account and stall information only for as long as it is needed for the purposes above, legitimate record-keeping, dispute resolution or legal obligations, then delete or de-identify it where appropriate. Access is controlled through authenticated accounts and database rules; no security measure is absolute. If a security compromise creates a reasonable risk that personal information was accessed or acquired without authorisation, the operator will follow its POPIA notification obligations.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Your rights</h3>
+        <p>You may ask to access, correct, update or delete your personal information, object to certain processing, or lodge a complaint. Start with <PrivacyContact />. You may also complain to the Information Regulator of South Africa. We may need to verify your identity before acting on a request.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Browser storage and cookies</h3>
+        <p>Exhistall currently uses essential browser storage to keep an authenticated session active and protect account access. It does not currently load analytics, advertising or marketing tags. If non-essential cookies or similar technologies are introduced, they must be described here and remain off until an appropriate consent choice is available. You can clear browser storage in your browser settings; doing so will sign you out.</p>
+
+        <h3 className="text-xl font-bold mt-6 mb-2">Marketing</h3>
+        <p>Exhistall does not currently send marketing messages from this platform. If this changes, direct marketing preferences and an easy opt-out will be provided as required by law.</p>
       </>
     ),
   },
@@ -44,29 +76,14 @@ const legalContent = {
     title: 'Claim Your Business',
     content: (
       <>
-        <p className="text-center mb-8">Is your business already listed on Exhistalls? Fill out the form below to claim your stall and take control of your profile.</p>
-        <form className="space-y-6 bg-white dark:bg-slate-800 p-8 rounded-lg shadow-md">
-           <div>
-              <label htmlFor="business-name" className="block text-sm font-medium text-brand-dark dark:text-slate-300 mb-2">Business Name</label>
-              <input type="text" id="business-name" required className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-brand-light dark:bg-brand-dark focus:ring-2 focus:ring-brand-blue dark:focus:ring-brand-gold focus:border-transparent outline-none transition" />
-           </div>
-           <div>
-              <label htmlFor="your-name" className="block text-sm font-medium text-brand-dark dark:text-slate-300 mb-2">Your Full Name</label>
-              <input type="text" id="your-name" required className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-brand-light dark:bg-brand-dark focus:ring-2 focus:ring-brand-blue dark:focus:ring-brand-gold focus:border-transparent outline-none transition" />
-           </div>
-           <div>
-              <label htmlFor="email" className="block text-sm font-medium text-brand-dark dark:text-slate-300 mb-2">Your Email Address</label>
-              <input type="email" id="email" required className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-brand-light dark:bg-brand-dark focus:ring-2 focus:ring-brand-blue dark:focus:ring-brand-gold focus:border-transparent outline-none transition" />
-           </div>
-           <div className="pt-2">
-              <button type="submit" className="w-full bg-brand-blue text-white font-bold py-3 px-6 rounded-lg hover:bg-opacity-90 transition-colors">
-                Submit Claim
-              </button>
-           </div>
-        </form>
+        <p className="text-center mb-8">Business claims are not enabled yet. To protect stallholders, ownership changes must be verified by the market operator rather than collected through an unsecured form.</p>
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-6 text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+          <h3 className="text-xl font-bold">Need to claim a listing?</h3>
+          <p className="mt-2">Contact the market operator from its verified support channel. Do not send passwords, identity documents or sensitive information through public forms.</p>
+        </div>
       </>
     ),
-  }
+  },
 };
 
 const LegalPage: React.FC<LegalPageProps> = ({ pageType, onNavigate, onSearch, currentUser, onLogout }) => {
