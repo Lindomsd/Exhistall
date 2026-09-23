@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import type { Stall } from '../types';
 import { Icon } from './Icon';
@@ -10,36 +8,29 @@ interface StallCardProps {
 }
 
 const StallCard: React.FC<StallCardProps> = ({ stall, onClick }) => {
+  const averageRating = stall.reviews.length
+    ? (stall.reviews.reduce((total, review) => total + review.rating, 0) / stall.reviews.length).toFixed(1)
+    : null;
+  const location = stall.location.address.split(',').map((part) => part.trim()).filter(Boolean).pop() || 'Online / location on request';
+
   return (
-    <div 
-      className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer group"
-      onClick={() => onClick(stall)}
-    >
-      <div className="relative">
-        <img className="h-40 w-full object-cover" src={stall.banner_url} alt={`${stall.name} banner`} />
-        <div className="absolute top-0 left-0 w-full h-full bg-black/30 group-hover:bg-black/10 transition-opacity duration-300"></div>
-        <div className="absolute top-2 right-2 bg-brand-gold text-brand-blue text-xs font-bold px-2 py-1 rounded-full">{stall.category}</div>
+    <button type="button" onClick={() => onClick(stall)} className="group block w-full overflow-hidden rounded-lg bg-white text-left shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/40 dark:bg-slate-800 dark:focus-visible:ring-brand-gold/40">
+      <div className="relative h-40 bg-brand-blue/15 dark:bg-slate-700">
+        {stall.banner_url ? <img className="h-full w-full object-cover" src={stall.banner_url} alt={`${stall.name} banner`} /> : <div className="flex h-full items-center justify-center text-lg font-bold text-brand-blue dark:text-brand-gold">{stall.name}</div>}
+        <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/10" />
+        <span className="absolute right-2 top-2 rounded-full bg-brand-gold px-2 py-1 text-xs font-bold text-brand-blue">{stall.category}</span>
       </div>
       <div className="p-4">
-        <div className="flex items-center space-x-3">
-          <img className="h-12 w-12 rounded-full object-cover border-2 border-brand-light dark:border-slate-600" src={stall.logo_url} alt={`${stall.name} logo`} />
-          <div>
-            <h3 className="text-lg font-bold text-brand-blue dark:text-brand-gold">{stall.name}</h3>
-            <p className="text-sm text-brand-secondary dark:text-slate-400 truncate">{stall.slogan}</p>
-          </div>
+        <div className="flex items-center gap-3">
+          {stall.logo_url ? <img className="h-12 w-12 rounded-full border-2 border-brand-light object-cover dark:border-slate-600" src={stall.logo_url} alt={`${stall.name} logo`} /> : <div aria-hidden="true" className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-brand-light bg-brand-blue text-lg font-bold text-white dark:border-slate-600">{stall.name.charAt(0).toUpperCase()}</div>}
+          <div className="min-w-0"><h3 className="truncate text-lg font-bold text-brand-blue dark:text-brand-gold">{stall.name}</h3><p className="truncate text-sm text-brand-secondary dark:text-slate-400">{stall.slogan || 'Explore this stall'}</p></div>
         </div>
-        <div className="mt-4 flex justify-between items-center text-sm text-brand-secondary dark:text-slate-400">
-          <div className="flex items-center gap-1">
-            <Icon name="location" className="h-4 w-4 text-brand-blue dark:text-brand-gold" />
-            <span>{stall.location.address.split(',')[1]}</span>
-          </div>
-          <div className="flex items-center gap-1">
-             <Icon name="star" className="h-4 w-4 text-brand-gold" />
-            <span>{stall.reviews.length > 0 ? (stall.reviews.reduce((acc, r) => acc + r.rating, 0) / stall.reviews.length).toFixed(1) : 'New'} ({stall.reviews.length})</span>
-          </div>
+        <div className="mt-4 flex items-center justify-between gap-3 text-sm text-brand-secondary dark:text-slate-400">
+          <span className="flex min-w-0 items-center gap-1"><Icon name="location" className="h-4 w-4 shrink-0 text-brand-blue dark:text-brand-gold" /><span className="truncate">{location}</span></span>
+          <span className="flex shrink-0 items-center gap-1"><Icon name="star" className="h-4 w-4 text-brand-gold" />{averageRating ? `${averageRating} (${stall.reviews.length})` : 'New'}</span>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
