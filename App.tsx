@@ -16,7 +16,7 @@ import PricingPage from './pages/PricingPage';
 import LoginPage from './pages/LoginPage';
 import StallholderDashboardPage from './pages/StallholderDashboardPage';
 import { api } from './services/api';
-import type { Stall, PartnershipRequest, User, Product } from './types';
+import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem } from './types';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -129,7 +129,13 @@ const App: React.FC = () => {
   };
   
   const handleLogin = async (email: string, password: string): Promise<boolean> => {
-    const user = await api.login(email, password);
+    let user: User | null = null;
+    try {
+      user = await api.login(email, password);
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
+    }
     if (user) {
       setCurrentUser(user);
       await fetchDataForUser(user);
@@ -144,6 +150,21 @@ const App: React.FC = () => {
       return true;
     }
     return false;
+  };
+
+  const handleSignUp = async (name: string, email: string, password: string) => {
+    try {
+      const result = await api.signUp(name, email, password);
+      if (result.user) {
+        setCurrentUser(result.user);
+        await fetchDataForUser(result.user);
+        handleNavigate(result.user.stallId ? 'stallholder-dashboard' : 'home');
+      }
+      return { success: true, confirmationRequired: result.confirmationRequired };
+    } catch (error) {
+      console.error('Sign-up failed:', error);
+      return { success: false, confirmationRequired: false, message: error instanceof Error ? error.message : 'Account creation failed.' };
+    }
   };
 
   const handleLogout = async () => {
@@ -177,7 +198,7 @@ const App: React.FC = () => {
     }
   };
   
-  const handleCreateStall = async (stallData: Omit<Stall, 'id' | 'ownerId' | 'status'>) => {
+  const handleCreateStall = async (stallData: StallInput) => {
       const newStall = await api.createStall(stallData);
       if (newStall) {
           setAllStalls(prev => [...prev, newStall]);
@@ -199,7 +220,7 @@ const App: React.FC = () => {
     }
   }
 
-  const handleAddProduct = async (stallId: string, productData: Omit<Product, 'id'>) => {
+  const handleAddProduct = async (stallId: string, productData: ProductInput) => {
     const updatedStall = await api.addProduct(stallId, productData);
     if(updatedStall) setCurrentUserStall(updatedStall);
   }
@@ -213,6 +234,22 @@ const App: React.FC = () => {
     const updatedStall = await api.deleteProduct(stallId, productId);
     if(updatedStall) setCurrentUserStall(updatedStall);
   }
+
+  const syncOwnedStall = (updatedStall: Stall | null) => {
+    if (!updatedStall) return;
+    setCurrentUserStall(updatedStall);
+    setAllStalls((previous) => previous.map((stall) => stall.id === updatedStall.id ? updatedStall : stall));
+    setStalls((previous) => previous.map((stall) => stall.id === updatedStall.id ? updatedStall : stall));
+    setSelectedStall((previous) => previous?.id === updatedStall.id ? updatedStall : previous);
+  };
+
+  const handleAddGalleryItem = async (stallId: string, url: string) => {
+    syncOwnedStall(await api.addGalleryItem(stallId, url));
+  };
+
+  const handleDeleteGalleryItem = async (stallId: string, item: GalleryItem) => {
+    syncOwnedStall(await api.deleteGalleryItem(stallId, item.id));
+  };
 
   const handleUpdatePartnershipStatus = async (requestId: string, status: 'accepted' | 'declined') => {
     const updatedRequest = await api.updatePartnershipRequestStatus(requestId, status);
@@ -237,7 +274,7 @@ const App: React.FC = () => {
 
   const renderPage = () => {
     if (currentPage === 'login') {
-      return <LoginPage onLogin={handleLogin} onNavigate={handleNavigate} />;
+      return <LoginPage onLogin={handleLogin} onSignUp={handleSignUp} onNavigate={handleNavigate} />;
     }
     
     if (currentPage === 'admin' && currentUser?.role === 'admin') {
@@ -265,6 +302,8 @@ const App: React.FC = () => {
           onAddProduct={handleAddProduct}
           onUpdateProduct={handleUpdateProduct}
           onDeleteProduct={handleDeleteProduct}
+          onAddGalleryItem={handleAddGalleryItem}
+          onDeleteGalleryItem={handleDeleteGalleryItem}
           onUpdatePartnershipStatus={handleUpdatePartnershipStatus}
         />
       );
