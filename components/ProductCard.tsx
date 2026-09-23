@@ -1,6 +1,6 @@
-import React from react;
-import type { Product } from ../types;
-import { Icon } from ./Icon;
+import React from 'react';
+import type { Product } from '../types';
+import { Icon } from './Icon';
 
 interface ProductCardProps {
   product: Product;
