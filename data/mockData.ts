@@ -1,12 +1,7 @@
-import type { Stall, PartnershipRequest, TeamMember, FaqItem, BlogPost, Job, Exhibition, User } from '../types';
+import type { Stall, PartnershipRequest, TeamMember, FaqItem, BlogPost, Job, Exhibition } from '../types';
 
-export const mockUsers: User[] = [
-  { id: 'user-1', name: 'Alice', email: 'alice@example.com', password: 'password', role: 'user', stallId: '1' },
-  { id: 'user-2', name: 'Bob', email: 'bob@example.com', password: 'password', role: 'user', stallId: '2' },
-  { id: 'user-3', name: 'Charlie', email: 'charlie@example.com', password: 'password', role: 'user', stallId: '4'},
-  { id: 'user-4', name: 'David', email: 'david@example.com', password: 'password', role: 'user'},
-  { id: 'mock-admin-user', name: 'Mock Admin', email: 'admin@exhistalls.com', password: 'password', role: 'admin', stallId: '3' },
-];
+// This file supplies editorial placeholder content for static pages only.
+// Authentication and marketplace data are loaded from Supabase.
 
 export const mockStalls: Stall[] = [
   {

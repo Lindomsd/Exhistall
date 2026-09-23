@@ -5,95 +5,12 @@ import Footer from '../components/Footer';
 import StallCard from '../components/StallCard';
 import { Icon } from '../components/Icon';
 
-interface HomePageProps {
-  stalls: Stall[];
-  onStallClick: (stall: Stall) => void;
-  onNavigate: (page: string) => void;
-  onSearch: (query: string) => void;
-  currentUser: User | null;
-  onLogout: () => void;
-}
-
-const categories = [
-    { name: 'Food & Drink', icon: 'food' },
-    { name: 'Fashion & Apparel', icon: 'fashion' },
-    { name: 'Digital Services', icon: 'digital' },
-    { name: 'Home & Craft', icon: 'craft' },
-    { name: 'Health & Beauty', icon: 'health' },
-    { name: 'Consulting', icon: 'consulting' },
-];
-
+interface HomePageProps { stalls: Stall[]; onStallClick: (stall: Stall) => void; onNavigate: (page: string) => void; onSearch: (query: string) => void; currentUser: User | null; onLogout: () => void; }
+const categories = [{ name: 'Food & Drink', icon: 'food' }, { name: 'Fashion & Apparel', icon: 'fashion' }, { name: 'Digital Services', icon: 'digital' }, { name: 'Home & Craft', icon: 'craft' }, { name: 'Health & Beauty', icon: 'health' }, { name: 'Consulting', icon: 'consulting' }];
 
 const HomePage: React.FC<HomePageProps> = ({ stalls, onStallClick, onNavigate, onSearch, currentUser, onLogout }) => {
-  const featuredStalls = stalls.filter(stall => stall.featured);
-
-  return (
-    <>
-      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
-      <main>
-        {/* Hero Section */}
-        <div className="bg-brand-blue">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white">
-              Showcase. Sell. Connect.
-            </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-brand-gold">
-              Your Business, Your Stall, Your Marketplace.
-            </p>
-            <div className="mt-8 flex justify-center gap-4">
-              <button onClick={() => onNavigate('marketplace')} className="bg-brand-gold text-brand-blue font-bold py-3 px-6 rounded-lg hover:bg-yellow-300 transition-colors">
-                Explore Stalls
-              </button>
-              <button onClick={() => onNavigate('create-stall')} className="bg-white/20 text-white font-bold py-3 px-6 rounded-lg hover:bg-white/30 transition-colors">
-                Create Your Stall
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Featured Stalls Section */}
-        <div className="py-16 bg-brand-light dark:bg-brand-dark">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-10">Featured Stalls</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredStalls.map(stall => (
-                <StallCard key={stall.id} stall={stall} onClick={onStallClick} />
-              ))}
-            </div>
-          </div>
-        </div>
-        
-        {/* Categories Section */}
-        <div className="py-16 bg-white dark:bg-slate-800">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-bold text-center mb-10">Browse by Category</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-                    {categories.map((category) => (
-                        <button key={category.name} onClick={() => onNavigate('categories')} className="flex flex-col items-center justify-center p-6 bg-brand-light dark:bg-brand-dark rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
-                            <Icon name={category.icon} className="h-10 w-10 text-brand-blue dark:text-brand-gold mb-3" />
-                            <span className="font-semibold text-center">{category.name}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </div>
-
-        {/* All Stalls Section */}
-        <div className="py-16 bg-brand-light dark:bg-brand-dark">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-10">All Stalls</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {stalls.map(stall => (
-                <StallCard key={stall.id} stall={stall} onClick={onStallClick} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-      </main>
-      <Footer onNavigate={onNavigate} />
-    </>
-  );
+  const featuredStalls = stalls.filter((stall) => stall.featured);
+  const spotlightStalls = featuredStalls.length ? featuredStalls : stalls.slice(0, 3);
+  return <><Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} /><main><section className="bg-brand-blue"><div className="container mx-auto px-4 py-20 text-center sm:px-6 lg:px-8"><p className="text-sm font-bold uppercase tracking-[0.2em] text-brand-gold">A digital exhibition for growing businesses</p><h1 className="mx-auto mt-3 max-w-4xl text-4xl font-extrabold text-white md:text-6xl">Build a stall people want to explore.</h1><p className="mx-auto mt-5 max-w-2xl text-lg text-blue-100">Discover independent businesses, their products and services, and the people behind the stall.</p><div className="mt-8 flex flex-wrap justify-center gap-4"><button type="button" onClick={() => onNavigate('marketplace')} className="rounded-lg bg-brand-gold px-6 py-3 font-bold text-brand-blue transition-colors hover:bg-yellow-300">Explore the exhibition</button><button type="button" onClick={() => onNavigate('create-stall')} className="rounded-lg bg-white/15 px-6 py-3 font-bold text-white transition-colors hover:bg-white/25">Open your stall</button></div></div></section><section className="bg-white py-12 dark:bg-slate-800"><div className="container mx-auto grid gap-5 px-4 text-center sm:grid-cols-3 sm:px-6 lg:px-8"><div><strong className="block text-3xl text-brand-blue dark:text-brand-gold">{stalls.length}</strong><span className="text-sm text-brand-secondary dark:text-slate-400">active stalls to discover</span></div><div><strong className="block text-3xl text-brand-blue dark:text-brand-gold">{stalls.reduce((total, stall) => total + stall.products.length, 0)}</strong><span className="text-sm text-brand-secondary dark:text-slate-400">products and services listed</span></div><div><strong className="block text-3xl text-brand-blue dark:text-brand-gold">{new Set(stalls.map((stall) => stall.category)).size}</strong><span className="text-sm text-brand-secondary dark:text-slate-400">business categories represented</span></div></div></section><section className="bg-brand-light py-16 dark:bg-brand-dark"><div className="container mx-auto px-4 sm:px-6 lg:px-8"><div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue dark:text-brand-gold">Spotlight</p><h2 className="mt-2 text-3xl font-bold">{featuredStalls.length ? 'Featured stalls' : 'New at the exhibition'}</h2></div><button type="button" onClick={() => onNavigate('marketplace')} className="font-semibold text-brand-blue hover:underline dark:text-brand-gold">View marketplace →</button></div>{spotlightStalls.length ? <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">{spotlightStalls.map((stall) => <StallCard key={stall.id} stall={stall} onClick={onStallClick} />)}</div> : <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center dark:border-slate-600"><h2 className="text-2xl font-bold">The exhibition is getting ready</h2><p className="mt-2 text-brand-secondary dark:text-slate-400">Be one of the first businesses to open a stall.</p><button type="button" onClick={() => onNavigate('create-stall')} className="mt-5 rounded-lg bg-brand-blue px-4 py-2 font-bold text-white">Create your stall</button></div>}</div></section><section className="bg-white py-16 dark:bg-slate-800"><div className="container mx-auto px-4 sm:px-6 lg:px-8"><h2 className="text-center text-3xl font-bold">Browse by category</h2><div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">{categories.map((category) => <button type="button" key={category.name} onClick={() => onNavigate('categories')} className="flex flex-col items-center justify-center rounded-lg bg-brand-light p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:bg-brand-dark"><Icon name={category.icon} className="mb-3 h-10 w-10 text-brand-blue dark:text-brand-gold" /><span className="text-center font-semibold">{category.name}</span></button>)}</div></div></section></main><Footer onNavigate={onNavigate} /></>;
 };
-
 export default HomePage;

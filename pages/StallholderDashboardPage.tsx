@@ -4,8 +4,9 @@ import Footer from '../components/Footer';
 import StallForm from '../components/StallForm';
 import ProductForm from '../components/ProductForm';
 import PartnershipRequestCard from '../components/PartnershipRequestCard';
+import GalleryManager from '../components/GalleryManager';
 import { Icon } from '../components/Icon';
-import type { Stall, PartnershipRequest, User, Product } from '../types';
+import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem } from '../types';
 
 interface StallholderDashboardPageProps {
   stall: Stall;
@@ -18,6 +19,8 @@ interface StallholderDashboardPageProps {
   onAddProduct: (stallId: string, productData: Omit<Product, 'id'>) => Promise<void>;
   onUpdateProduct: (stallId: string, productId: string, updates: Partial<Product>) => Promise<void>;
   onDeleteProduct: (stallId: string, productId: string) => Promise<void>;
+  onAddGalleryItem: (stallId: string, url: string) => Promise<void>;
+  onDeleteGalleryItem: (stallId: string, item: GalleryItem) => Promise<void>;
   onUpdatePartnershipStatus: (requestId: string, status: 'accepted' | 'declined') => Promise<void>;
 }
 
@@ -53,35 +56,81 @@ const StallholderDashboardPage: React.FC<StallholderDashboardPageProps> = (props
     onAddProduct,
     onUpdateProduct,
     onDeleteProduct,
+    onAddGalleryItem,
+    onDeleteGalleryItem,
     onUpdatePartnershipStatus
   } = props;
   
   const [activeTab, setActiveTab] = useState('overview');
   const [isSaving, setIsSaving] = useState(false);
+  const [actionError, setActionError] = useState('');
   const [productModal, setProductModal] = useState<ProductModalState>({ isOpen: false, mode: 'add', product: null });
   
-  const handleStallUpdate = async (formData: any) => {
+  const handleStallUpdate = async (formData: StallInput) => {
       setIsSaving(true);
-      await onUpdateStall(stall.id, formData);
-      setIsSaving(false);
-      alert('Stall updated successfully!');
-      setActiveTab('overview');
+      setActionError('');
+      try {
+        await onUpdateStall(stall.id, formData);
+        setActiveTab('overview');
+      } catch (error) {
+        setActionError(error instanceof Error ? error.message : 'We could not update your stall. Please try again.');
+      } finally {
+        setIsSaving(false);
+      }
   }
 
-  const handleProductSubmit = async (productData: any) => {
+  const handleProductSubmit = async (productData: ProductInput) => {
       setIsSaving(true);
-      if(productModal.mode === 'add') {
-        await onAddProduct(stall.id, productData);
-      } else if (productModal.product) {
-        await onUpdateProduct(stall.id, productModal.product.id, productData);
+      setActionError('');
+      try {
+        if(productModal.mode === 'add') {
+          await onAddProduct(stall.id, productData);
+        } else if (productModal.product) {
+          await onUpdateProduct(stall.id, productModal.product.id, productData);
+        }
+        setProductModal({ isOpen: false, mode: 'add', product: null });
+      } catch (error) {
+        setActionError(error instanceof Error ? error.message : 'We could not save this product. Please try again.');
+      } finally {
+        setIsSaving(false);
       }
-      setIsSaving(false);
-      setProductModal({ isOpen: false, mode: 'add', product: null });
   }
 
   const handleDeleteProductClick = async (productId: string) => {
       if(window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
-          await onDeleteProduct(stall.id, productId);
+          setActionError('');
+          try {
+            await onDeleteProduct(stall.id, productId);
+          } catch (error) {
+            setActionError(error instanceof Error ? error.message : 'We could not delete this product. Please try again.');
+          }
+      }
+  }
+
+  const handleAddGalleryItem = async (url: string) => {
+      setIsSaving(true);
+      setActionError('');
+      try {
+        await onAddGalleryItem(stall.id, url);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'We could not add this gallery image. Please try again.';
+        setActionError(message);
+        throw new Error(message);
+      } finally {
+        setIsSaving(false);
+      }
+  }
+
+  const handleDeleteGalleryItem = async (item: GalleryItem) => {
+      if (!window.confirm('Remove this image from your gallery?')) return;
+      setIsSaving(true);
+      setActionError('');
+      try {
+        await onDeleteGalleryItem(stall.id, item);
+      } catch (error) {
+        setActionError(error instanceof Error ? error.message : 'We could not remove this gallery image. Please try again.');
+      } finally {
+        setIsSaving(false);
       }
   }
 
@@ -146,6 +195,8 @@ const StallholderDashboardPage: React.FC<StallholderDashboardPageProps> = (props
                         </div>
                    </div>
               );
+          case 'manage-gallery':
+              return <GalleryManager gallery={stall.gallery} onAdd={handleAddGalleryItem} onDelete={handleDeleteGalleryItem} isSaving={isSaving} />;
           case 'partnerships':
               return (
                   <div>
@@ -195,6 +246,7 @@ const StallholderDashboardPage: React.FC<StallholderDashboardPageProps> = (props
     {id: 'overview', label: 'Overview', icon: 'dashboard'},
     {id: 'edit-stall', label: 'Edit Stall', icon: 'edit'},
     {id: 'manage-products', label: 'Manage Products', icon: 'package'},
+    {id: 'manage-gallery', label: 'Manage Gallery', icon: 'upload'},
     {id: 'partnerships', label: 'Partnerships', icon: 'briefcase'},
   ];
 
@@ -224,6 +276,7 @@ const StallholderDashboardPage: React.FC<StallholderDashboardPageProps> = (props
                 </div>
             </aside>
             <div className="lg:col-span-3">
+              {actionError && <p role="alert" className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">{actionError}</p>}
               {renderTabContent()}
             </div>
           </div>
@@ -239,6 +292,7 @@ const StallholderDashboardPage: React.FC<StallholderDashboardPageProps> = (props
                         <h3 className="text-xl font-bold">{productModal.mode === 'add' ? 'Add New Product' : 'Edit Product'}</h3>
                         <button onClick={() => setProductModal({isOpen: false, mode: 'add', product: null})} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700"><Icon name="x" className="h-5 w-5"/></button>
                      </div>
+                     {actionError && <p role="alert" className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">{actionError}</p>}
                      <ProductForm 
                         product={productModal.product}
                         onSubmit={handleProductSubmit}

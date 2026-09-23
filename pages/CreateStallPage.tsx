@@ -2,34 +2,36 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import StallForm from '../components/StallForm';
-import type { Stall, User } from '../types';
+import type { StallInput, User } from '../types';
 
 interface CreateStallPageProps {
   onNavigate: (page: string) => void;
   onSearch: (query: string) => void;
-  onCreateStall: (stallData: Omit<Stall, 'id' | 'ownerId' | 'status'>) => Promise<void>;
+  onCreateStall: (stallData: StallInput) => Promise<void>;
   currentUser: User | null;
   onLogout: () => void;
 }
 
 const CreateStallPage: React.FC<CreateStallPageProps> = ({ onNavigate, onSearch, onCreateStall, currentUser, onLogout }) => {
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [error, setError] = React.useState('');
   
-  const handleSubmit = async (formData: Omit<Stall, 'id' | 'ownerId' | 'status' | 'featured' | 'products' | 'gallery' | 'reviews'>) => {
+  const handleSubmit = async (formData: StallInput) => {
     if (!currentUser) {
-        alert("You must be logged in to create a stall.");
         onNavigate('login');
         return;
     }
 
-    const stallData = {
-        ...formData,
-        logo_url: 'https://picsum.photos/seed/newlogo/200/200', // Placeholder
-        banner_url: 'https://picsum.photos/seed/newbanner/1200/400', // Placeholder
-    };
-
-    await onCreateStall(stallData);
-    alert("Stall submitted for review! You will be notified once it's approved by an admin.");
-    onNavigate('stallholder-dashboard');
+    setError('');
+    setIsSaving(true);
+    try {
+      await onCreateStall(formData);
+      onNavigate('stallholder-dashboard');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'We could not submit your stall. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
   
   if (!currentUser) {
@@ -68,7 +70,8 @@ const CreateStallPage: React.FC<CreateStallPageProps> = ({ onNavigate, onSearch,
             <h1 className="text-4xl font-extrabold text-center mb-4">Create Your Stall</h1>
             <p className="text-center text-brand-secondary dark:text-slate-400 mb-10">Fill out the details below to get your virtual stall up and running. It will be submitted for admin review upon completion.</p>
             
-            <StallForm onSubmit={handleSubmit} onCancel={() => onNavigate('home')} />
+            {error && <p role="alert" className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
+            <StallForm onSubmit={handleSubmit} onCancel={() => onNavigate('home')} isSaving={isSaving} submitLabel="Submit for Review" />
 
           </div>
         </div>
