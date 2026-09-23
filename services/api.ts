@@ -1,195 +1,281 @@
-import { mockStalls, mockPartnershipRequests, mockUsers } from '../data/mockData';
-import type { Stall, PartnershipRequest, User, Product } from '../types';
+import { requireSupabase } from '../supabaseClient';
+import type { GalleryItem, PartnershipRequest, Product, ProductInput, Review, Stall, StallInput, User } from '../types';
 
-// Simulate a database and session storage
-let stalls: Stall[] = JSON.parse(JSON.stringify(mockStalls));
-let users: User[] = JSON.parse(JSON.stringify(mockUsers));
-let partnershipRequests: PartnershipRequest[] = JSON.parse(JSON.stringify(mockPartnershipRequests));
-let currentUser: User | null = null; // No one is logged in initially
+type DbProfile = { id: string; name: string; email: string; role: 'user' | 'admin' };
+type DbProduct = { id: string; name: string; description: string; price: number | string; image_url: string };
+type DbGallery = { id: string; type: 'image' | 'video'; url: string; thumbnail_url?: string | null };
+type DbReview = { id: string; author: string; rating: number; comment: string; created_at: string };
+type DbStall = {
+  id: string; owner_id: string; name: string; slogan: string; category: string;
+  logo_url: string; banner_url: string; description: string; mission: string;
+  address: string; latitude: number | null; longitude: number | null;
+  phone: string; email: string; website: string; featured: boolean;
+  status: Stall['status']; products?: DbProduct[]; gallery_items?: DbGallery[]; reviews?: DbReview[];
+};
+type DbPartnership = {
+  id: string; proposer_stall_id: string; recipient_stall_id: string;
+  message: string; status: PartnershipRequest['status']; created_at: string;
+};
 
-const MOCK_API_DELAY = 300; // ms
+const stallSelect = '*, products(*), gallery_items(*), reviews(*)';
 
-// Helper to simulate network delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const toProduct = (row: DbProduct): Product => ({
+  id: row.id,
+  name: row.name,
+  description: row.description,
+  price: Number(row.price),
+  imageUrl: row.image_url,
+});
 
-// Denormalize partnership requests for easier use in the UI
-const denormalizePartnershipRequests = (requests: PartnershipRequest[]): PartnershipRequest[] => {
-  return requests.map(req => ({
-    ...req,
-    proposerStall: stalls.find(s => s.id === req.proposerStallId),
-    recipientStall: stalls.find(s => s.id === req.recipientStallId),
-  }));
-}
+const toStall = (row: DbStall): Stall => ({
+  id: row.id,
+  ownerId: row.owner_id,
+  name: row.name,
+  slogan: row.slogan,
+  category: row.category,
+  logo_url: row.logo_url,
+  banner_url: row.banner_url,
+  description: row.description,
+  mission: row.mission,
+  products: (row.products ?? []).map(toProduct),
+  gallery: (row.gallery_items ?? []).map((item): GalleryItem => ({
+    id: item.id,
+    type: item.type,
+    url: item.url,
+    thumbnailUrl: item.thumbnail_url ?? undefined,
+  })),
+  reviews: (row.reviews ?? []).map((review): Review => ({
+    id: review.id,
+    author: review.author,
+    rating: review.rating,
+    comment: review.comment,
+    date: review.created_at,
+  })),
+  location: { address: row.address, lat: row.latitude ?? 0, lng: row.longitude ?? 0 },
+  contact: { phone: row.phone, email: row.email, website: row.website },
+  featured: row.featured,
+  status: row.status,
+});
+
+const toUser = async (authUser: { id: string; email?: string } | null): Promise<User | null> => {
+  if (!authUser) return null;
+  const client = requireSupabase();
+  const { data: profile, error } = await client
+    .from('profiles')
+    .select('id, name, email, role')
+    .eq('id', authUser.id)
+    .maybeSingle<DbProfile>();
+  if (error) throw error;
+
+  const { data: stall, error: stallError } = await client
+    .from('stalls')
+    .select('id')
+    .eq('owner_id', authUser.id)
+    .maybeSingle<{ id: string }>();
+  if (stallError) throw stallError;
+
+  return {
+    id: authUser.id,
+    email: profile?.email ?? authUser.email,
+    name: profile?.name ?? authUser.email?.split('@')[0] ?? 'Member',
+    role: profile?.role ?? 'user',
+    stallId: stall?.id,
+  };
+};
+
+const fetchStall = async (id: string): Promise<Stall | null> => {
+  const client = requireSupabase();
+  const { data, error } = await client.from('stalls').select(stallSelect).eq('id', id).maybeSingle<DbStall>();
+  if (error) throw error;
+  return data ? toStall(data) : null;
+};
+
+const toPartnership = async (row: DbPartnership): Promise<PartnershipRequest> => {
+  const [proposerStall, recipientStall] = await Promise.all([
+    fetchStall(row.proposer_stall_id),
+    fetchStall(row.recipient_stall_id),
+  ]);
+  return {
+    id: row.id,
+    proposerStallId: row.proposer_stall_id,
+    recipientStallId: row.recipient_stall_id,
+    proposerStall: proposerStall ?? undefined,
+    recipientStall: recipientStall ?? undefined,
+    message: row.message,
+    status: row.status,
+    date: row.created_at,
+  };
+};
+
+const stallPayload = (stall: Partial<Stall>) => ({
+  ...(stall.name !== undefined && { name: stall.name.trim() }),
+  ...(stall.slogan !== undefined && { slogan: stall.slogan.trim() }),
+  ...(stall.category !== undefined && { category: stall.category }),
+  ...(stall.logo_url !== undefined && { logo_url: stall.logo_url }),
+  ...(stall.banner_url !== undefined && { banner_url: stall.banner_url }),
+  ...(stall.description !== undefined && { description: stall.description.trim() }),
+  ...(stall.mission !== undefined && { mission: stall.mission.trim() }),
+  ...(stall.location?.address !== undefined && { address: stall.location.address.trim() }),
+  ...(stall.location?.lat !== undefined && { latitude: stall.location.lat }),
+  ...(stall.location?.lng !== undefined && { longitude: stall.location.lng }),
+  ...(stall.contact?.phone !== undefined && { phone: stall.contact.phone.trim() }),
+  ...(stall.contact?.email !== undefined && { email: stall.contact.email.trim() }),
+  ...(stall.contact?.website !== undefined && { website: stall.contact.website.trim() }),
+});
 
 export const api = {
   async getStalls(): Promise<Stall[]> {
-    await delay(MOCK_API_DELAY);
-    console.log('Mock API: Fetched stalls');
-    // Filter out pending stalls for public view
-    return JSON.parse(JSON.stringify(stalls.filter(s => s.status === 'active')));
+    const client = requireSupabase();
+    const { data, error } = await client.from('stalls').select(stallSelect).eq('status', 'active').order('featured', { ascending: false }).order('created_at', { ascending: false });
+    if (error) throw error;
+    return ((data ?? []) as DbStall[]).map(toStall);
   },
 
   async getAllStallsForAdmin(): Promise<Stall[]> {
-    await delay(MOCK_API_DELAY);
-    console.log('Mock API: Fetched all stalls for admin');
-    return JSON.parse(JSON.stringify(stalls));
+    const client = requireSupabase();
+    const { data, error } = await client.from('stalls').select(stallSelect).order('created_at', { ascending: false });
+    if (error) throw error;
+    return ((data ?? []) as DbStall[]).map(toStall);
   },
 
-  async getStallById(id: string): Promise<Stall | null> {
-    await delay(MOCK_API_DELAY);
-    const stall = stalls.find(s => s.id === id);
-    console.log(`Mock API: Fetched stall by id ${id}`);
-    return stall ? JSON.parse(JSON.stringify(stall)) : null;
-  },
-  
+  getStallById: fetchStall,
+
   async login(email: string, password: string): Promise<User | null> {
-    await delay(MOCK_API_DELAY);
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      currentUser = { ...user };
-      console.log(`Mock API: User ${user.name} logged in`);
-      return JSON.parse(JSON.stringify(currentUser));
-    }
-    console.log('Mock API: Login failed');
-    currentUser = null;
-    return null;
+    const client = requireSupabase();
+    const { data, error } = await client.auth.signInWithPassword({ email: email.trim(), password });
+    if (error) return null;
+    return toUser(data.user);
+  },
+
+  async signUp(name: string, email: string, password: string): Promise<{ user: User | null; confirmationRequired: boolean }> {
+    const client = requireSupabase();
+    const { data, error } = await client.auth.signUp({
+      email: email.trim(),
+      password,
+      options: { data: { name: name.trim() } },
+    });
+    if (error) throw error;
+    // With email confirmation enabled Supabase returns a user but no session.
+    // Do not treat that unconfirmed user as signed in in the browser.
+    return { user: data.session ? await toUser(data.user) : null, confirmationRequired: !data.session };
   },
 
   async logout(): Promise<void> {
-    await delay(MOCK_API_DELAY / 2);
-    currentUser = null;
-    console.log('Mock API: User logged out');
-  },
-  
-  async getCurrentUser(): Promise<User | null> {
-    await delay(MOCK_API_DELAY / 2);
-    return currentUser ? JSON.parse(JSON.stringify(currentUser)) : null;
-  },
-  
-  async getUsers(): Promise<User[]> {
-      await delay(MOCK_API_DELAY);
-      console.log('Mock API: Fetched all users');
-      return JSON.parse(JSON.stringify(users));
+    const { error } = await requireSupabase().auth.signOut();
+    if (error) throw error;
   },
 
-  async createStall(stallData: Omit<Stall, 'id' | 'ownerId' | 'status' >): Promise<Stall | null> {
-      if (!currentUser) return null;
-      await delay(MOCK_API_DELAY);
-      const newStall: Stall = {
-        ...stallData,
-        id: `stall-${Date.now()}`,
-        ownerId: currentUser.id,
-        status: 'pending_review',
-        featured: false,
-        products: [],
-        gallery: [],
-        reviews: [],
-      };
-      stalls.push(newStall);
-      // Also update the user record
-      const userIndex = users.findIndex(u => u.id === currentUser!.id);
-      if(userIndex > -1) {
-          users[userIndex].stallId = newStall.id;
-          if (currentUser) {
-            currentUser.stallId = newStall.id;
-          }
-      }
-      console.log(`Mock API: Created new stall "${newStall.name}" for user ${currentUser.name}`);
-      return JSON.parse(JSON.stringify(newStall));
+  async getCurrentUser(): Promise<User | null> {
+    const { data, error } = await requireSupabase().auth.getUser();
+    if (error) return null;
+    return toUser(data.user);
+  },
+
+  async getUsers(): Promise<User[]> {
+    const client = requireSupabase();
+    const { data: profiles, error } = await client.from('profiles').select('id, name, email, role').order('created_at', { ascending: false });
+    if (error) throw error;
+    const { data: stalls, error: stallsError } = await client.from('stalls').select('id, owner_id');
+    if (stallsError) throw stallsError;
+    const stallByOwner = new Map((stalls ?? []).map((stall: { id: string; owner_id: string }) => [stall.owner_id, stall.id]));
+    return ((profiles ?? []) as DbProfile[]).map(profile => ({ ...profile, stallId: stallByOwner.get(profile.id) }));
+  },
+
+  async createStall(stallData: StallInput): Promise<Stall | null> {
+    const user = await this.getCurrentUser();
+    if (!user) throw new Error('Please sign in before creating a stall.');
+    if (user.stallId) throw new Error('You already have a stall.');
+    const client = requireSupabase();
+    const payload = {
+      ...stallPayload(stallData),
+      owner_id: user.id,
+      status: 'pending_review' as const,
+      featured: false,
+    };
+    const { data, error } = await client.from('stalls').insert(payload).select(stallSelect).single<DbStall>();
+    if (error) throw error;
+    return toStall(data);
   },
 
   async updateStall(stallId: string, updates: Partial<Stall>): Promise<Stall | null> {
-      await delay(MOCK_API_DELAY);
-      const stallIndex = stalls.findIndex(s => s.id === stallId);
-      if(stallIndex > -1) {
-          stalls[stallIndex] = { ...stalls[stallIndex], ...updates };
-          console.log(`Mock API: Updated stall ${stallId}`);
-          return JSON.parse(JSON.stringify(stalls[stallIndex]));
-      }
-      return null;
+    const payload = stallPayload(updates);
+    const { data, error } = await requireSupabase().from('stalls').update(payload).eq('id', stallId).select(stallSelect).maybeSingle<DbStall>();
+    if (error) throw error;
+    return data ? toStall(data) : null;
   },
 
   async updateStallStatus(stallId: string, status: Stall['status']): Promise<Stall | null> {
-    await delay(MOCK_API_DELAY);
-    const stallIndex = stalls.findIndex(s => s.id === stallId);
-    if (stallIndex !== -1) {
-      stalls[stallIndex].status = status;
-      console.log(`Mock API: Updated stall ${stallId} status to ${status}`);
-      return JSON.parse(JSON.stringify(stalls[stallIndex]));
-    }
-    console.error(`Mock API: Stall with id ${stallId} not found`);
-    return null;
+    const { data, error } = await requireSupabase().rpc('admin_update_stall_status', { target_stall_id: stallId, next_status: status });
+    if (error) throw error;
+    return data ? fetchStall(stallId) : null;
   },
 
   async proposePartnership(proposerStall: Stall, recipientStall: Stall, message: string): Promise<PartnershipRequest> {
-      await delay(MOCK_API_DELAY);
-      const newRequest: PartnershipRequest = {
-        id: `pr-${Date.now()}`,
-        proposerStallId: proposerStall.id,
-        recipientStallId: recipientStall.id,
-        message,
-        status: 'pending',
-        date: new Date().toISOString().split('T')[0],
-      };
-      partnershipRequests.push(newRequest);
-      console.log('Mock API: Created new partnership request');
-      return denormalizePartnershipRequests([newRequest])[0];
+    const { data, error } = await requireSupabase()
+      .from('partnership_requests')
+      .insert({ proposer_stall_id: proposerStall.id, recipient_stall_id: recipientStall.id, message: message.trim(), status: 'pending' })
+      .select('*').single<DbPartnership>();
+    if (error) throw error;
+    return toPartnership(data);
   },
-  
+
   async getPartnershipRequestsForStall(stallId: string): Promise<PartnershipRequest[]> {
-      await delay(MOCK_API_DELAY);
-      const requests = partnershipRequests.filter(
-        req => req.proposerStallId === stallId || req.recipientStallId === stallId
-      );
-      console.log(`Mock API: Fetched partnership requests for stall ${stallId}`);
-      return denormalizePartnershipRequests(JSON.parse(JSON.stringify(requests)));
+    const client = requireSupabase();
+    const { data, error } = await client
+      .from('partnership_requests')
+      .select('*')
+      .or(`proposer_stall_id.eq.${stallId},recipient_stall_id.eq.${stallId}`)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return Promise.all(((data ?? []) as DbPartnership[]).map(toPartnership));
   },
-  
+
   async updatePartnershipRequestStatus(requestId: string, status: 'accepted' | 'declined'): Promise<PartnershipRequest | null> {
-      await delay(MOCK_API_DELAY);
-      const requestIndex = partnershipRequests.findIndex(req => req.id === requestId);
-      if(requestIndex > -1) {
-          partnershipRequests[requestIndex].status = status;
-          console.log(`Mock API: Updated partnership request ${requestId} to ${status}`);
-          return denormalizePartnershipRequests([partnershipRequests[requestIndex]])[0];
-      }
-      return null;
+    const { data, error } = await requireSupabase().from('partnership_requests').update({ status }).eq('id', requestId).select('*').maybeSingle<DbPartnership>();
+    if (error) throw error;
+    return data ? toPartnership(data) : null;
   },
-  
-  async addProduct(stallId: string, productData: Omit<Product, 'id'>): Promise<Stall | null> {
-      await delay(MOCK_API_DELAY);
-      const stallIndex = stalls.findIndex(s => s.id === stallId);
-      if(stallIndex > -1) {
-          const newProduct: Product = { ...productData, id: `prod-${Date.now()}` };
-          stalls[stallIndex].products.push(newProduct);
-          console.log(`Mock API: Added product to stall ${stallId}`);
-          return JSON.parse(JSON.stringify(stalls[stallIndex]));
-      }
-      return null;
+
+  async addGalleryItem(stallId: string, url: string): Promise<Stall | null> {
+    const { error } = await requireSupabase().from('gallery_items').insert({
+      stall_id: stallId,
+      type: 'image',
+      url: url.trim(),
+    });
+    if (error) throw error;
+    return fetchStall(stallId);
   },
-  
+
+  async deleteGalleryItem(stallId: string, galleryItemId: string): Promise<Stall | null> {
+    const { error } = await requireSupabase().from('gallery_items').delete().eq('id', galleryItemId).eq('stall_id', stallId);
+    if (error) throw error;
+    return fetchStall(stallId);
+  },
+
+  async addProduct(stallId: string, productData: ProductInput): Promise<Stall | null> {
+    const { error } = await requireSupabase().from('products').insert({
+      stall_id: stallId, name: productData.name.trim(), description: productData.description.trim(),
+      price: productData.price, image_url: productData.imageUrl.trim(),
+    });
+    if (error) throw error;
+    return fetchStall(stallId);
+  },
+
   async updateProduct(stallId: string, productId: string, updates: Partial<Product>): Promise<Stall | null> {
-      await delay(MOCK_API_DELAY);
-      const stallIndex = stalls.findIndex(s => s.id === stallId);
-      if(stallIndex > -1) {
-          const productIndex = stalls[stallIndex].products.findIndex(p => p.id === productId);
-          if (productIndex > -1) {
-              stalls[stallIndex].products[productIndex] = { ...stalls[stallIndex].products[productIndex], ...updates };
-              console.log(`Mock API: Updated product ${productId} in stall ${stallId}`);
-              return JSON.parse(JSON.stringify(stalls[stallIndex]));
-          }
-      }
-      return null;
+    const payload = {
+      ...(updates.name !== undefined && { name: updates.name.trim() }),
+      ...(updates.description !== undefined && { description: updates.description.trim() }),
+      ...(updates.price !== undefined && { price: updates.price }),
+      ...(updates.imageUrl !== undefined && { image_url: updates.imageUrl.trim() }),
+    };
+    const { error } = await requireSupabase().from('products').update(payload).eq('id', productId).eq('stall_id', stallId);
+    if (error) throw error;
+    return fetchStall(stallId);
   },
-  
+
   async deleteProduct(stallId: string, productId: string): Promise<Stall | null> {
-      await delay(MOCK_API_DELAY);
-      const stallIndex = stalls.findIndex(s => s.id === stallId);
-      if(stallIndex > -1) {
-          stalls[stallIndex].products = stalls[stallIndex].products.filter(p => p.id !== productId);
-          console.log(`Mock API: Deleted product ${productId} from stall ${stallId}`);
-          return JSON.parse(JSON.stringify(stalls[stallIndex]));
-      }
-      return null;
-  }
+    const { error } = await requireSupabase().from('products').delete().eq('id', productId).eq('stall_id', stallId);
+    if (error) throw error;
+    return fetchStall(stallId);
+  },
 };
