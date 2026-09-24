@@ -21,7 +21,11 @@ const AdminMfaPage: React.FC<AdminMfaPageProps> = ({ currentUser, onLogout, onVe
 
   const loadState = async () => {
     try {
-      setState(await api.getAdminMfaState());
+      const nextState = await api.getAdminMfaState();
+      setState(nextState);
+      // An earlier setup may have created a factor but not yet verified it.
+      // Reuse it instead of attempting a duplicate enrollment.
+      if (nextState.pendingFactorId) setFactorId(nextState.pendingFactorId);
     } catch {
       setError('We could not check your administrator security status. Please sign in again.');
     }
@@ -67,7 +71,8 @@ const AdminMfaPage: React.FC<AdminMfaPageProps> = ({ currentUser, onLogout, onVe
           <p className="text-sm font-bold uppercase tracking-wide text-brand-blue dark:text-brand-gold">Administrator security</p>
           <h1 className="mt-2 text-2xl font-extrabold">Verify it’s you</h1>
           <p className="mt-3 text-sm text-brand-secondary dark:text-slate-300">Administrator tools can approve stalls and view protected records. They need a time-based one-time code in addition to your password.</p>
-          {!qrCode && !state?.enrolled && <button type="button" onClick={() => void startSetup()} disabled={isBusy} className="mt-6 w-full rounded-lg bg-brand-blue px-5 py-3 font-bold text-white disabled:opacity-60">{isBusy ? 'Preparing setup…' : 'Set up authenticator app'}</button>}
+          {!qrCode && !state?.enrolled && !state?.pendingFactorId && <button type="button" onClick={() => void startSetup()} disabled={isBusy} className="mt-6 w-full rounded-lg bg-brand-blue px-5 py-3 font-bold text-white disabled:opacity-60">{isBusy ? 'Preparing setup…' : 'Set up authenticator app'}</button>}
+          {state?.pendingFactorId && !qrCode && <p className="mt-6 rounded-md bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">Two-factor setup is waiting for verification. Use the current code from the Exhistall entry already in your authenticator app.</p>}
           {qrCode && <div className="mt-6 rounded-lg border border-slate-200 p-4 text-center dark:border-slate-600"><p className="mb-3 text-sm font-medium">Scan this with Google Authenticator, Microsoft Authenticator, Authy, or another authenticator app.</p><img src={qrCode} alt="Authenticator setup QR code" className="mx-auto h-48 w-48 rounded bg-white p-2" /></div>}
           {(state?.enrolled || factorId) && <form onSubmit={verify} className="mt-6 space-y-4"><div><label htmlFor="mfa-code" className="mb-2 block text-sm font-bold">Authenticator code</label><input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} required pattern="[0-9]{6}" placeholder="123456" className="w-full rounded-md border border-slate-300 bg-white p-3 text-center text-xl tracking-[0.4em] outline-none focus:ring-2 focus:ring-brand-blue dark:border-slate-600 dark:bg-brand-dark dark:focus:ring-brand-gold" /></div><button disabled={isBusy || code.length !== 6} className="w-full rounded-lg bg-brand-blue px-5 py-3 font-bold text-white disabled:opacity-60">{isBusy ? 'Verifying…' : 'Verify and open admin area'}</button></form>}
           {error && <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300" role="alert">{error}</p>}
