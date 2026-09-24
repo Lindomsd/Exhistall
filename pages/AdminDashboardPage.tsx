@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icon';
-import type { Stall, User } from '../types';
+import ExhibitionManager from '../components/ExhibitionManager';
+import type { Exhibition, ExhibitionInput, Stall, User } from '../types';
 
 interface AdminDashboardPageProps {
   stalls: Stall[];
@@ -11,6 +12,12 @@ interface AdminDashboardPageProps {
   currentUser: User;
   onLogout: () => void;
   onUpdateStallStatus: (stallId: string, status: Stall['status']) => void;
+  exhibitions: Exhibition[];
+  onCreateExhibition: (input: ExhibitionInput) => Promise<void>;
+  onUpdateExhibition: (id: string, updates: Partial<ExhibitionInput>) => Promise<void>;
+  onDeleteExhibition: (id: string) => Promise<void>;
+  onAssignStallToExhibition: (exhibitionId: string, stallId: string, boothLabel: string, sortOrder: number) => Promise<void>;
+  onRemoveStallFromExhibition: (exhibitionId: string, stallId: string) => Promise<void>;
   onSearch: (query: string) => void;
 }
 
@@ -34,7 +41,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => (
   </div>
 );
 
-const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ stalls, users, onNavigate, currentUser, onLogout, onUpdateStallStatus, onSearch }) => {
+const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ stalls, users, onNavigate, currentUser, onLogout, onUpdateStallStatus, exhibitions, onCreateExhibition, onUpdateExhibition, onDeleteExhibition, onAssignStallToExhibition, onRemoveStallFromExhibition, onSearch }) => {
   const [activeTab, setActiveTab] = useState('stalls');
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | Stall['status']>('all');
@@ -224,11 +231,12 @@ const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ stalls, users, 
           <div className="mb-8 border-b border-gray-300 dark:border-slate-700">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 <button onClick={() => setActiveTab('stalls')} className={`${activeTab === 'stalls' ? 'border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold' : 'border-transparent text-brand-secondary hover:border-gray-400'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Stalls</button>
+                <button onClick={() => setActiveTab('exhibitions')} className={`${activeTab === 'exhibitions' ? 'border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold' : 'border-transparent text-brand-secondary hover:border-gray-400'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Exhibition halls</button>
                 <button onClick={() => setActiveTab('users')} className={`${activeTab === 'users' ? 'border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold' : 'border-transparent text-brand-secondary hover:border-gray-400'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}>Users</button>
             </nav>
           </div>
 
-          {activeTab === 'stalls' ? <StallsManagement /> : <UsersManagement />}
+          {activeTab === 'stalls' ? <StallsManagement /> : activeTab === 'exhibitions' ? <ExhibitionManager exhibitions={exhibitions} stalls={stalls} onCreate={onCreateExhibition} onUpdate={onUpdateExhibition} onDelete={onDeleteExhibition} onAssign={onAssignStallToExhibition} onRemove={onRemoveStallFromExhibition} onOpenStall={(stall) => onNavigate('stall', stall.id)} /> : <UsersManagement />}
           
         </div>
       </main>
