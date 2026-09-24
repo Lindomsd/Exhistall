@@ -31,6 +31,26 @@ export interface Promotion {
 
 export type PromotionInput = Omit<Promotion, 'id'>;
 
+export type QuoteRequestStatus = 'new' | 'replied' | 'closed';
+export type PreferredContactMethod = 'whatsapp' | 'phone' | 'email';
+
+export interface QuoteRequest {
+  id: string;
+  stallId: string;
+  productId?: string;
+  productName?: string;
+  requesterName: string;
+  requesterPhone: string;
+  requesterEmail: string;
+  preferredContact: PreferredContactMethod;
+  message: string;
+  budgetNote: string;
+  status: QuoteRequestStatus;
+  createdAt: string;
+}
+
+export type QuoteRequestInput = Omit<QuoteRequest, 'id' | 'stallId' | 'productName' | 'status' | 'createdAt'>;
+
 export interface Review {
   id:string;
   author: string;
