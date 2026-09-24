@@ -58,7 +58,7 @@ create policy "products: visible when available" on public.products for select
           s.owner_id = auth.uid()
           or public.is_admin()
           or (
-            s.status = (chr(97)||chr(99)||chr(116)||chr(105)||chr(118)||chr(101))
+            s.status = ((chr(97)||chr(99)||chr(116)||chr(105)||chr(118)||chr(101))::public.stall_status)
             and products.is_available = true
           )
         )
@@ -85,7 +85,7 @@ create policy "promotions: visible with active stall" on public.promotions for s
           s.owner_id = auth.uid()
           or public.is_admin()
           or (
-            s.status = (chr(97)||chr(99)||chr(116)||chr(105)||chr(118)||chr(101))
+            s.status = ((chr(97)||chr(99)||chr(116)||chr(105)||chr(118)||chr(101))::public.stall_status)
             and promotions.is_active = true
             and (promotions.start_at is null or promotions.start_at <= now())
             and (promotions.end_at is null or promotions.end_at >= now())
