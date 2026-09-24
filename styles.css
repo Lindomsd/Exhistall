@@ -107,6 +107,10 @@ button, input, select { font: inherit; }
 
 .market-sway { animation: market-sway 4s ease-in-out infinite; transform-origin: top center; }
 
+/* Homepage statistic band: retain contrast on the deep-navy surface. */
+.market-lane .text-brand-blue { color: #F7C948; }
+.market-lane .text-brand-secondary { color: #D7E3FA; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .market-stall, .market-stall:nth-child(even), .market-stall:nth-child(3n) { transform: none; }
