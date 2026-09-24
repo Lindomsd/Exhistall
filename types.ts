@@ -1,12 +1,35 @@
+export type CatalogueItemType = 'product' | 'service';
+
 export interface Product {
   id: string;
   name: string;
   description: string;
   price: number;
   imageUrl: string;
+  listingType?: CatalogueItemType;
+  category?: string;
+  priceNote?: string;
+  compareAtPrice?: number;
+  isAvailable?: boolean;
+  featured?: boolean;
+  sortOrder?: number;
 }
 
 export type ProductInput = Omit<Product, 'id'>;
+
+export interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  promotionLabel: string;
+  startAt?: string;
+  endAt?: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export type PromotionInput = Omit<Promotion, 'id'>;
 
 export interface Review {
   id:string;
@@ -21,6 +44,8 @@ export interface GalleryItem {
   type: 'image' | 'video';
   url: string;
   thumbnailUrl?: string;
+  caption?: string;
+  sortOrder?: number;
 }
 
 export interface Stall {
@@ -34,6 +59,7 @@ export interface Stall {
   description: string;
   mission: string;
   products: Product[];
+  promotions?: Promotion[];
   gallery: GalleryItem[];
   reviews: Review[];
   location: {
@@ -45,7 +71,11 @@ export interface Stall {
     phone: string;
     email: string;
     website: string;
+    whatsapp?: string;
+    instagram?: string;
+    facebook?: string;
   };
+  tradingHours?: string;
   featured?: boolean;
   status: 'active' | 'suspended' | 'banned' | 'pending_review';
 }
@@ -99,7 +129,7 @@ export interface Exhibition {
   imageUrl: string;
 }
 
-export type StallInput = Omit<Stall, 'id' | 'ownerId' | 'status' | 'featured' | 'products' | 'gallery' | 'reviews'>;
+export type StallInput = Omit<Stall, 'id' | 'ownerId' | 'status' | 'featured' | 'products' | 'promotions' | 'gallery' | 'reviews'>;
 
 export interface User {
   id: string;

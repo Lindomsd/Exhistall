@@ -17,7 +17,7 @@ import LoginPage from './pages/LoginPage';
 import StallholderDashboardPage from './pages/StallholderDashboardPage';
 import AdminMfaPage from './pages/AdminMfaPage';
 import { api } from './services/api';
-import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem } from './types';
+import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem, Promotion, PromotionInput } from './types';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -257,6 +257,18 @@ const App: React.FC = () => {
     if(updatedStall) setCurrentUserStall(updatedStall);
   }
 
+  const handleAddPromotion = async (stallId: string, promotionData: PromotionInput) => {
+    syncOwnedStall(await api.addPromotion(stallId, promotionData));
+  };
+
+  const handleUpdatePromotion = async (stallId: string, promotionId: string, updates: Partial<Promotion>) => {
+    syncOwnedStall(await api.updatePromotion(stallId, promotionId, updates));
+  };
+
+  const handleDeletePromotion = async (stallId: string, promotionId: string) => {
+    syncOwnedStall(await api.deletePromotion(stallId, promotionId));
+  };
+
   const syncOwnedStall = (updatedStall: Stall | null) => {
     if (!updatedStall) return;
     setCurrentUserStall(updatedStall);
@@ -328,6 +340,9 @@ const App: React.FC = () => {
           onAddProduct={handleAddProduct}
           onUpdateProduct={handleUpdateProduct}
           onDeleteProduct={handleDeleteProduct}
+          onAddPromotion={handleAddPromotion}
+          onUpdatePromotion={handleUpdatePromotion}
+          onDeletePromotion={handleDeletePromotion}
           onAddGalleryItem={handleAddGalleryItem}
           onDeleteGalleryItem={handleDeleteGalleryItem}
           onUpdatePartnershipStatus={handleUpdatePartnershipStatus}

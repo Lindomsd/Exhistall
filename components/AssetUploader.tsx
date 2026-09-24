@@ -6,7 +6,7 @@ interface AssetUploaderProps {
   label: string;
   value: string;
   onChange: (url: string) => void;
-  folder: 'logos' | 'banners' | 'products' | 'gallery';
+  folder: 'logos' | 'banners' | 'products' | 'gallery' | 'promotions';
   helpText?: string;
   disabled?: boolean;
 }
