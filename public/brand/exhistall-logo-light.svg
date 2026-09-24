@@ -1,1 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 190" role="img" aria-labelledby="title desc">\n  <title id="title">Exhistall</title>\n  <desc id="desc">A gold and white exhibition hall mark with the Exhistall wordmark</desc>\n  <defs>\n    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE36E"/><stop offset="1" stop-color="#F7B500"/></linearGradient>\n    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>\n  </defs>\n  <g transform="translate(12 17)">\n    <path d="M8 66 82 20l74 46v79H130V86c0-24-19-43-43-43S44 62 44 86v59H8V66Z" fill="#fff" opacity=".98"/>\n    <path d="m8 66 74-46 74 46" fill="none" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" stroke-width="15" filter="url(#glow)"/>\n    <path d="M55 145V93c0-18 14-33 32-33s32 15 32 33v52" fill="#0A2463"/>\n    <path d="M61 145V97c0-14 11-25 26-25s26 11 26 25v48" fill="#12377E"/>\n    <path d="M12 146h145" stroke="url(#gold)" stroke-linecap="round" stroke-width="9"/>\n  </g>\n  <g fill="#fff">\n    <text x="194" y="106" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-3">EXHISTALL</text>\n    <text x="198" y="139" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" letter-spacing="4.1" opacity=".86">THE DIGITAL MARKETPLACE</text>\n  </g>\n</svg>\n
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 190" role="img" aria-labelledby="title description">
+  <title id="title">Exhistall</title>
+  <desc id="description">Exhistall digital marketplace logo</desc>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE36E" />
+      <stop offset="1" stop-color="#F7B500" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(12 17)">
+    <path d="M8 66 82 20l74 46v79H130V86c0-24-19-43-43-43S44 62 44 86v59H8V66Z" fill="#F8FBFF" />
+    <path d="m8 66 74-46 74 46" fill="none" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" stroke-width="15" />
+    <path d="M55 145V93c0-18 14-33 32-33s32 15 32 33v52" fill="#071D49" />
+    <path d="M61 145V97c0-14 11-25 26-25s26 11 26 25v48" fill="#12377E" />
+    <path d="M12 146h145" stroke="url(#gold)" stroke-linecap="round" stroke-width="9" />
+  </g>
+  <g fill="#F8FBFF">
+    <text x="194" y="106" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-3">EXHISTALL</text>
+    <text x="198" y="139" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" letter-spacing="4.1" opacity=".9">THE DIGITAL MARKETPLACE</text>
+  </g>
+</svg>
