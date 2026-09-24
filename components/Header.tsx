@@ -36,6 +36,7 @@ const Header: React.FC<HeaderProps> = ({ onBack, onNavigate, currentUser, onLogo
   const navLinks = [
     { name: 'Market square', page: 'home' },
     { name: 'Browse aisles', page: 'marketplace' },
+    { name: 'Exhibition halls', page: 'exhibitions' },
     { name: 'Find a stall', page: 'categories' },
   ];
 
