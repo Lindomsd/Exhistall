@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   color-scheme: light;
   font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
@@ -8,18 +12,18 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: #fff9ed;
-  color: #18233d;
+  background: #071D49;
+  color: #EAF1FF;
 }
 
 button, input, select { font: inherit; }
 
 .market-canvas {
-  background-color: #fff7e9;
+  background-color: #071D49;
   background-image:
-    radial-gradient(circle at 15% 10%, rgba(255, 213, 101, .42), transparent 24rem),
-    radial-gradient(circle at 85% 20%, rgba(94, 169, 137, .20), transparent 22rem),
-    linear-gradient(180deg, #fff8eb 0%, #f8e7c6 100%);
+    radial-gradient(circle at 15% 8%, rgba(247, 201, 72, .16), transparent 25rem),
+    radial-gradient(circle at 85% 18%, rgba(33, 86, 157, .24), transparent 24rem),
+    linear-gradient(180deg, #071D49 0%, #0A2453 55%, #061738 100%);
 }
 
 .market-grain {
