@@ -1,17 +1,21 @@
 -- Exhistall: owner operations for catalogue, services, offers and contact readiness.
--- Apply after the Phase 1–3 migrations. This is additive and keeps existing stalls usable.
+-- Apply after the Phase 1-3 migrations. This is additive and keeps existing stalls usable.
+-- Uses character expressions for text values so it survives quote-altering editors.
 
 alter table public.stalls
-  add column if not exists trading_hours text not null default $$$$,
-  add column if not exists whatsapp text not null default $$$$,
-  add column if not exists instagram text not null default $$$$,
-  add column if not exists facebook text not null default $$$$;
+  add column if not exists trading_hours text not null default left(chr(32), 0),
+  add column if not exists whatsapp text not null default left(chr(32), 0),
+  add column if not exists instagram text not null default left(chr(32), 0),
+  add column if not exists facebook text not null default left(chr(32), 0);
 
 alter table public.products
-  add column if not exists listing_type text not null default $$product$$
-    check (listing_type in ($$product$$, $$service$$)),
-  add column if not exists category text not null default $$$$,
-  add column if not exists price_note text not null default $$$$,
+  add column if not exists listing_type text not null default (chr(112)||chr(114)||chr(111)||chr(100)||chr(117)||chr(99)||chr(116))
+    check (listing_type in (
+      chr(112)||chr(114)||chr(111)||chr(100)||chr(117)||chr(99)||chr(116),
+      chr(115)||chr(101)||chr(114)||chr(118)||chr(105)||chr(99)||chr(101)
+    )),
+  add column if not exists category text not null default left(chr(32), 0),
+  add column if not exists price_note text not null default left(chr(32), 0),
   add column if not exists compare_at_price numeric(12,2)
     check (compare_at_price is null or compare_at_price >= 0),
   add column if not exists is_available boolean not null default true,
@@ -19,16 +23,16 @@ alter table public.products
   add column if not exists sort_order integer not null default 0;
 
 alter table public.gallery_items
-  add column if not exists caption text not null default $$$$,
+  add column if not exists caption text not null default left(chr(32), 0),
   add column if not exists sort_order integer not null default 0;
 
 create table if not exists public.promotions (
   id uuid primary key default gen_random_uuid(),
   stall_id uuid not null references public.stalls(id) on delete cascade,
   title text not null check (char_length(trim(title)) between 2 and 120),
-  description text not null default $$$$,
-  image_url text not null default $$$$,
-  promotion_label text not null default $$$$,
+  description text not null default left(chr(32), 0),
+  image_url text not null default left(chr(32), 0),
+  promotion_label text not null default left(chr(32), 0),
   start_at timestamptz,
   end_at timestamptz,
   is_active boolean not null default true,
@@ -42,9 +46,9 @@ drop trigger if exists promotions_updated_at on public.promotions;
 create trigger promotions_updated_at before update on public.promotions
 for each row execute function public.set_updated_at();
 
--- Keep unpublished catalogue items visible to their owner/admin only. The original
--- Phase 1 policy exposes every product of an active stall, so replace it explicitly.
+-- Keep unpublished catalogue items visible to their owner/admin only.
 drop policy if exists "products: visible with visible stall" on public.products;
+drop policy if exists "products: visible when available" on public.products;
 create policy "products: visible when available" on public.products for select
   using (
     exists (
@@ -53,7 +57,10 @@ create policy "products: visible when available" on public.products for select
         and (
           s.owner_id = auth.uid()
           or public.is_admin()
-          or (s.status = $$active$$ and products.is_available = true)
+          or (
+            s.status = (chr(97)||chr(99)||chr(116)||chr(105)||chr(118)||chr(101))
+            and products.is_available = true
+          )
         )
     )
   );
@@ -67,6 +74,8 @@ create index if not exists promotions_stall_live_idx
 
 alter table public.promotions enable row level security;
 
+drop policy if exists "promotions: visible with active stall" on public.promotions;
+drop policy if exists "promotions: owner manages" on public.promotions;
 create policy "promotions: visible with active stall" on public.promotions for select
   using (
     exists (
@@ -75,7 +84,12 @@ create policy "promotions: visible with active stall" on public.promotions for s
         and (
           s.owner_id = auth.uid()
           or public.is_admin()
-          or (s.status = $$active$$ and promotions.is_active = true and (promotions.start_at is null or promotions.start_at <= now()) and (promotions.end_at is null or promotions.end_at >= now()))
+          or (
+            s.status = (chr(97)||chr(99)||chr(116)||chr(105)||chr(118)||chr(101))
+            and promotions.is_active = true
+            and (promotions.start_at is null or promotions.start_at <= now())
+            and (promotions.end_at is null or promotions.end_at >= now())
+          )
         )
     )
   );
