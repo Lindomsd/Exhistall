@@ -140,14 +140,28 @@ export interface Job {
   type: 'Full-time' | 'Part-time';
 }
 
+export type ExhibitionStatus = 'draft' | 'published' | 'archived';
+
+export interface ExhibitionStall {
+  stall: Stall;
+  boothLabel?: string;
+  sortOrder: number;
+}
+
 export interface Exhibition {
   id: string;
   title: string;
-  date: string;
   description: string;
-  status: 'upcoming' | 'past';
-  imageUrl: string;
+  heroImageUrl: string;
+  location: string;
+  startsAt?: string;
+  endsAt?: string;
+  status: ExhibitionStatus;
+  sortOrder: number;
+  stalls: ExhibitionStall[];
 }
+
+export type ExhibitionInput = Omit<Exhibition, 'id' | 'stalls'>;
 
 export type StallInput = Omit<Stall, 'id' | 'ownerId' | 'status' | 'featured' | 'products' | 'promotions' | 'gallery' | 'reviews'>;
 
