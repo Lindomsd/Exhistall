@@ -1,4 +1,4 @@
-import type { Stall, PartnershipRequest, TeamMember, FaqItem, BlogPost, Job, Exhibition } from '../types';
+import type { Stall, PartnershipRequest, TeamMember, FaqItem, BlogPost, Job } from '../types';
 
 // This file supplies editorial placeholder content for static pages only.
 // Authentication and marketplace data are loaded from Supabase.
@@ -159,10 +159,4 @@ export const mockJobs: Job[] = [
   { id: 'job2', title: 'Product Manager', department: 'Product', location: 'Remote', type: 'Full-time' },
   { id: 'job3', title: 'Digital Marketing Specialist', department: 'Marketing', location: 'New York, NY', type: 'Full-time' },
   { id: 'job4', title: 'Customer Support Associate', department: 'Support', location: 'Remote', type: 'Part-time' },
-];
-
-export const mockExhibitions: Exhibition[] = [
-  { id: 'ex1', title: 'Holiday Makers Market', date: 'December 1-3, 2023', description: 'A festive showcase of handcrafted gifts, holiday decor, and seasonal treats from our most creative stallholders.', status: 'upcoming', imageUrl: 'https://picsum.photos/seed/ex1/600/400' },
-  { id: 'ex2', title: 'Summer Digital Services Expo', date: 'August 15, 2023', description: 'Connect with top digital agencies and freelancers offering services in web design, marketing, and more.', status: 'past', imageUrl: 'https://picsum.photos/seed/ex2/600/400' },
-  { id: 'ex3', title: 'Artisanal Food Fair', date: 'July 20-22, 2023', description: 'A celebration of culinary craftsmanship, featuring the best in local and artisanal food and drink products.', status: 'past', imageUrl: 'https://picsum.photos/seed/ex3/600/400' },
 ];
