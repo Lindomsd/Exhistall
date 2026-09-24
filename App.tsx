@@ -17,7 +17,7 @@ import LoginPage from './pages/LoginPage';
 import StallholderDashboardPage from './pages/StallholderDashboardPage';
 import AdminMfaPage from './pages/AdminMfaPage';
 import { api } from './services/api';
-import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem, Promotion, PromotionInput } from './types';
+import type { Stall, StallInput, PartnershipRequest, User, Product, ProductInput, GalleryItem, Promotion, PromotionInput, QuoteRequest, QuoteRequestInput, QuoteRequestStatus } from './types';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -25,6 +25,7 @@ const App: React.FC = () => {
   const [stalls, setStalls] = useState<Stall[]>([]);
   const [allStalls, setAllStalls] = useState<Stall[]>([]); // Includes pending, for admin
   const [partnershipRequests, setPartnershipRequests] = useState<PartnershipRequest[]>([]);
+  const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,6 +81,12 @@ const App: React.FC = () => {
       } catch (error) {
         console.error('Failed to load partnership requests:', error);
         setPartnershipRequests([]);
+      }
+      try {
+        setQuoteRequests(await api.getQuoteRequestsForStall(user.stallId));
+      } catch (error) {
+        console.error('Failed to load quote requests:', error);
+        setQuoteRequests([]);
       }
     }
   };
@@ -186,6 +193,7 @@ const App: React.FC = () => {
     setCurrentUser(null);
     setCurrentUserStall(null);
     setPartnershipRequests([]);
+    setQuoteRequests([]);
     setAllStalls([]);
     setUsers([]);
     setAdminMfaVerified(false);
@@ -292,6 +300,15 @@ const App: React.FC = () => {
     }
   }
 
+  const handleCreateQuoteRequest = async (stallId: string, input: QuoteRequestInput) => {
+    await api.createQuoteRequest(stallId, input);
+  };
+
+  const handleUpdateQuoteRequestStatus = async (requestId: string, status: QuoteRequestStatus) => {
+    const updatedRequest = await api.updateQuoteRequestStatus(requestId, status);
+    if (updatedRequest) setQuoteRequests((previous) => previous.map((request) => request.id === requestId ? updatedRequest : request));
+  };
+
   useEffect(() => {
     document.body.className = 'bg-brand-light dark:bg-brand-dark text-brand-dark dark:text-brand-light';
   }, []);
@@ -332,6 +349,7 @@ const App: React.FC = () => {
         <StallholderDashboardPage 
           stall={currentUserStall}
           partnershipRequests={partnershipRequests}
+          quoteRequests={quoteRequests}
           onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
@@ -346,6 +364,7 @@ const App: React.FC = () => {
           onAddGalleryItem={handleAddGalleryItem}
           onDeleteGalleryItem={handleDeleteGalleryItem}
           onUpdatePartnershipStatus={handleUpdatePartnershipStatus}
+          onUpdateQuoteRequestStatus={handleUpdateQuoteRequestStatus}
         />
       );
     }
@@ -372,6 +391,7 @@ const App: React.FC = () => {
           onBack={handleGoBack} 
           currentUser={currentUser}
           onProposePartnership={handleProposePartnership}
+          onCreateQuoteRequest={handleCreateQuoteRequest}
           onNavigate={handleNavigate}
           onSearch={handleSearch}
           onLogout={handleLogout}
