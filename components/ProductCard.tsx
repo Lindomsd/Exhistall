@@ -2,22 +2,9 @@ import React from 'react';
 import type { Product } from '../types';
 import { Icon } from './Icon';
 
-interface ProductCardProps {
-  product: Product;
-}
-
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => (
-  <article className="market-stall flex h-full flex-col bg-white dark:bg-slate-800">
-    <div className="relative h-52 overflow-hidden bg-[#f3dfbb] dark:bg-slate-700">
-      {product.imageUrl ? <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={product.imageUrl} alt={product.name} /> : <div className="flex h-full flex-col items-center justify-center px-4 text-center text-sm font-semibold text-brand-secondary dark:text-slate-300"><Icon name="package" className="mb-2 h-9 w-9 text-[#b84c32]" />Freshly added to the counter</div>}
-      <span className="product-tag absolute bottom-3 left-0 bg-brand-gold py-2 pl-4 pr-5 text-sm font-extrabold text-brand-blue shadow-sm">R {product.price.toFixed(2)}</span>
-    </div>
-    <div className="flex flex-grow flex-col p-5">
-      <h3 className="truncate text-lg font-extrabold text-brand-dark dark:text-white">{product.name}</h3>
-      {product.description && <p className="mt-2 flex-grow text-sm leading-relaxed text-brand-secondary dark:text-slate-400">{product.description}</p>}
-      <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#b84c32]"><Icon name="arrow-right" className="h-4 w-4" /> See it at this stall</p>
-    </div>
-  </article>
-);
-
+interface ProductCardProps { product: Product; }
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const hasSaving = product.compareAtPrice !== undefined && product.compareAtPrice > product.price;
+  return <article className="market-stall flex h-full flex-col bg-white dark:bg-slate-800"><div className="relative h-52 overflow-hidden bg-[#f3dfbb] dark:bg-slate-700">{product.imageUrl ? <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={product.imageUrl} alt={product.name} /> : <div className="flex h-full flex-col items-center justify-center px-4 text-center text-sm font-semibold text-brand-secondary dark:text-slate-300"><Icon name={product.listingType === 'service' ? 'briefcase' : 'package'} className="mb-2 h-9 w-9 text-[#b84c32]" />Freshly added to the counter</div>}<div className="absolute left-0 top-3 flex gap-2">{product.listingType === 'service' && <span className="rounded-r-full bg-brand-blue px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-white">Service</span>}{product.featured && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-extrabold text-amber-800">Featured</span>}</div><span className="product-tag absolute bottom-3 left-0 bg-brand-gold py-2 pl-4 pr-5 text-sm font-extrabold text-brand-blue shadow-sm">{hasSaving && <span className="mr-2 text-xs line-through opacity-70">R {product.compareAtPrice?.toFixed(2)}</span>}R {product.price.toFixed(2)}</span></div><div className="flex flex-grow flex-col p-5">{product.category && <p className="text-xs font-bold uppercase tracking-wide text-[#b84c32]">{product.category}</p>}<h3 className="mt-1 truncate text-lg font-extrabold text-brand-dark dark:text-white">{product.name}</h3>{product.description && <p className="mt-2 flex-grow text-sm leading-relaxed text-brand-secondary dark:text-slate-400">{product.description}</p>}{product.priceNote && <p className="mt-3 text-xs font-semibold text-brand-secondary dark:text-slate-400">{product.priceNote}</p>}<p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#b84c32]"><Icon name="arrow-right" className="h-4 w-4" /> {product.listingType === 'service' ? 'Ask about this service' : 'See it at this stall'}</p></div></article>;
+};
 export default ProductCard;
