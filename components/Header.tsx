@@ -80,7 +80,7 @@ export default function Header({
               aria-label="Exhistall home"
             >
               <img
-                src="/brand/exhistall-logo-light.svg"
+                src="/brand/exhistall-logo-reversed.svg"
                 alt="Exhistall — the digital marketplace"
                 className="h-10 w-auto max-w-[10.75rem] sm:h-11 sm:max-w-[13.5rem]"
               />
@@ -162,7 +162,7 @@ export default function Header({
                     <button
                       type="button"
                       onClick={openStall}
-                      className="market-chip ml-1 rounded-full bg-brand-gold px-4 py-2 text-sm font-extrabold text-brand-blue hover:bg-yellow-300"
+                      className="market-chip ml-1 rounded-full bg-brand-gold px-4 py-2 text-sm font-extrabold text-brand-blue hover:bg-brand-sunlit"
                     >
                       Open a stall
                     </button>

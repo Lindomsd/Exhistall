@@ -62,7 +62,7 @@ export default function ExhibitionsPage({
         onLogout={onLogout}
       />
       <main className="bg-brand-light dark:bg-brand-dark">
-        <section className="border-b border-brand-blue/10 bg-gradient-to-br from-brand-blue to-blue-800 text-white">
+        <section className="border-b border-brand-blue/10 bg-gradient-to-br from-brand-blue to-brand-midnight text-white">
           <div className="mx-auto px-4 py-14 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-blue-100">
@@ -98,7 +98,7 @@ export default function ExhibitionsPage({
               <button
                 type="button"
                 onClick={() => onNavigate('marketplace')}
-                className="mt-6 rounded-lg bg-brand-blue px-5 py-3 font-bold text-white transition hover:bg-blue-800"
+                className="mt-6 rounded-lg bg-brand-blue px-5 py-3 font-bold text-white transition hover:bg-brand-midnight"
               >
                 Browse stalls
               </button>
@@ -117,7 +117,7 @@ export default function ExhibitionsPage({
                       className="h-56 w-full object-cover sm:h-72"
                     />
                   ) : (
-                    <div className="flex h-40 items-center justify-center bg-gradient-to-br from-brand-blue to-blue-800 text-brand-gold">
+                    <div className="flex h-40 items-center justify-center bg-gradient-to-br from-brand-blue to-brand-midnight text-brand-gold">
                       <Icon name="building-office" className="h-16 w-16" />
                     </div>
                   )}
@@ -161,7 +161,7 @@ export default function ExhibitionsPage({
                       <button
                         type="button"
                         onClick={() => startBooking(exhibition)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-5 py-3 font-bold text-white transition hover:bg-blue-800"
+                        className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-5 py-3 font-bold text-white transition hover:bg-brand-midnight"
                       >
                         <Icon name="ticket" className="h-5 w-5" />
                         Book a stall

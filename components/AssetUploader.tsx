@@ -13,7 +13,14 @@ interface AssetUploaderProps {
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const AssetUploader: React.FC<AssetUploaderProps> = ({ label, value, onChange, folder, helpText, disabled = false }) => {
+const AssetUploader: React.FC<AssetUploaderProps> = ({
+  label,
+  value,
+  onChange,
+  folder,
+  helpText,
+  disabled = false,
+}) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
 
@@ -38,7 +45,12 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ label, value, onChange, f
       const { data: authData, error: authError } = await client.auth.getUser();
       if (authError || !authData.user) throw new Error('Please sign in before uploading an image.');
 
-      const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+      const extension =
+        file.name
+          .split('.')
+          .pop()
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, '') || 'jpg';
       const path = `${authData.user.id}/${folder}/${crypto.randomUUID()}.${extension}`;
       const { error: uploadError } = await client.storage.from('stall-assets').upload(path, file, {
         cacheControl: '3600',
@@ -50,7 +62,11 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ label, value, onChange, f
       const { data } = client.storage.from('stall-assets').getPublicUrl(path);
       onChange(data.publicUrl);
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'We could not upload that image. Please try again.');
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : 'We could not upload that image. Please try again.',
+      );
     } finally {
       setIsUploading(false);
     }
@@ -58,7 +74,9 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ label, value, onChange, f
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-brand-dark dark:text-slate-300">{label}</label>
+      <label className="block text-sm font-medium text-brand-dark dark:text-slate-300">
+        {label}
+      </label>
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
           type="url"
@@ -71,12 +89,28 @@ const AssetUploader: React.FC<AssetUploaderProps> = ({ label, value, onChange, f
         <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-brand-blue px-3 py-2 text-sm font-semibold text-brand-blue transition-colors hover:bg-brand-blue/10 dark:border-brand-gold dark:text-brand-gold dark:hover:bg-brand-gold/10">
           <Icon name="upload" className="h-4 w-4" />
           {isUploading ? 'Uploading…' : 'Upload'}
-          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={handleFileChange} disabled={disabled || isUploading} />
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="sr-only"
+            onChange={handleFileChange}
+            disabled={disabled || isUploading}
+          />
         </label>
       </div>
-      {value && <img src={value} alt="Selected upload preview" className="h-20 w-20 rounded-md border border-gray-200 object-cover dark:border-slate-600" />}
+      {value && (
+        <img
+          src={value}
+          alt="Selected upload preview"
+          className="h-20 w-20 rounded-md border border-gray-200 object-cover dark:border-slate-600"
+        />
+      )}
       {helpText && <p className="text-xs text-brand-secondary dark:text-slate-400">{helpText}</p>}
-      {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

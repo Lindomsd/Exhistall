@@ -66,7 +66,7 @@ export default function HomePage({
                 <button
                   type="button"
                   onClick={() => onNavigate('marketplace')}
-                  className="market-chip inline-flex items-center gap-2 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue transition hover:bg-yellow-300"
+                  className="market-chip inline-flex items-center gap-2 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue transition hover:bg-brand-sunlit"
                 >
                   <Icon name="arrow-right" className="h-5 w-5" /> Enter the market
                 </button>
@@ -79,7 +79,7 @@ export default function HomePage({
                 </button>
               </div>
             </div>
-            <div className="market-arch relative mx-auto mt-12 max-w-5xl overflow-hidden border border-brand-gold/25 bg-[#15386F] shadow-2xl shadow-black/20">
+            <div className="market-arch relative mx-auto mt-12 max-w-5xl overflow-hidden border border-brand-gold/25 bg-brand-blue shadow-2xl shadow-black/20">
               <img
                 src="/social/exhistall-hero-marketplace.svg"
                 alt="A welcoming Exhistall exhibition hall and digital marketplace"
@@ -98,7 +98,7 @@ export default function HomePage({
         </section>
 
         {/* Stats */}
-        <section className="market-lane border-y border-white/10 bg-[#0E2A5A] py-5">
+        <section className="market-lane border-y border-white/10 bg-brand-blue py-5">
           <div className="mx-auto grid grid-cols-3 gap-3 px-4 text-center sm:px-6 lg:px-8">
             <div>
               <strong className="market-display-font block text-3xl text-brand-blue sm:text-4xl">
@@ -128,7 +128,7 @@ export default function HomePage({
         </section>
 
         {/* Featured */}
-        <section className="bg-[#071D49] py-16 sm:py-20">
+        <section className="bg-brand-blue py-16 sm:py-20">
           <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
@@ -180,7 +180,7 @@ export default function HomePage({
         </section>
 
         {/* Aisles */}
-        <section className="border-y border-white/10 bg-[#102A56] py-16 sm:py-20">
+        <section className="border-y border-white/10 bg-brand-midnight py-16 sm:py-20">
           <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-sm font-extrabold tracking-[.18em] text-brand-gold uppercase">
@@ -224,7 +224,7 @@ export default function HomePage({
             <button
               type="button"
               onClick={() => onNavigate('create-stall')}
-              className="market-chip mt-7 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue hover:bg-yellow-300"
+              className="market-chip mt-7 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue hover:bg-brand-sunlit"
             >
               Open a stall at Exhistall
             </button>

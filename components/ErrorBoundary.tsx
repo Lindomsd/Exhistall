@@ -35,13 +35,13 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
           <p className="mt-3 text-blue-100">
             Something unexpected happened while loading this page. Your data is safe — try again.
           </p>
-          <pre className="mt-4 max-h-32 overflow-auto rounded-lg bg-[#061738] p-3 text-left text-xs text-red-200">
+          <pre className="mt-4 max-h-32 overflow-auto rounded-lg bg-[#091B42] p-3 text-left text-xs text-red-200">
             {error.message}
           </pre>
           <button
             type="button"
             onClick={this.handleReset}
-            className="market-chip mt-6 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue transition hover:bg-yellow-300"
+            className="market-chip mt-6 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue transition hover:bg-brand-sunlit"
           >
             Try again
           </button>

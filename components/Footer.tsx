@@ -77,7 +77,7 @@ export default function Footer(_props: FooterProps) {
               aria-label="Exhistall home"
             >
               <img
-                src="/brand/exhistall-logo-light.svg"
+                src="/brand/exhistall-logo-reversed.svg"
                 alt="Exhistall — the digital marketplace"
                 className="h-14 w-auto max-w-[15rem]"
               />
@@ -88,7 +88,7 @@ export default function Footer(_props: FooterProps) {
             </p>
             <Link
               to="/open-a-stall"
-              className="market-chip mt-6 rounded-full bg-brand-gold px-5 py-3 font-extrabold text-brand-blue hover:bg-yellow-300"
+              className="market-chip mt-6 rounded-full bg-brand-gold px-5 py-3 font-extrabold text-brand-blue hover:bg-brand-sunlit"
             >
               Set up your stall
             </Link>

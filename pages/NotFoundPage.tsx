@@ -14,7 +14,7 @@ export default function NotFoundPage() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             to="/"
-            className="market-chip inline-flex items-center gap-2 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue transition hover:bg-yellow-300"
+            className="market-chip inline-flex items-center gap-2 rounded-full bg-brand-gold px-6 py-3 font-extrabold text-brand-blue transition hover:bg-brand-sunlit"
           >
             <Icon name="arrow-right" className="h-5 w-5" /> Back to the market
           </Link>

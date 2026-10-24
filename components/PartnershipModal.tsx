@@ -10,7 +10,12 @@ interface PartnershipModalProps {
   onSubmit: (message: string) => void;
 }
 
-const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, recipientStall, onSubmit }) => {
+const PartnershipModal: React.FC<PartnershipModalProps> = ({
+  isOpen,
+  onClose,
+  recipientStall,
+  onSubmit,
+}) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,22 +36,28 @@ const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, re
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div 
-        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md transform transition-all"
-      >
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md transform transition-all">
         <div className="p-6">
           <div className="flex items-start justify-between">
             <div>
-              <h3 id="modal-title" className="text-lg font-bold text-brand-blue dark:text-brand-gold">
+              <h3
+                id="modal-title"
+                className="text-lg font-bold text-brand-blue dark:text-brand-gold"
+              >
                 Propose Partnership
               </h3>
               <p className="text-sm text-brand-secondary dark:text-slate-400 mt-1">
                 To: <span className="font-semibold">{recipientStall.name}</span>
               </p>
             </div>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="p-1 rounded-full text-brand-secondary dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
               aria-label="Close modal"
             >
@@ -55,7 +66,10 @@ const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, re
           </div>
 
           <form onSubmit={handleSubmit} className="mt-4">
-            <label htmlFor="partnership-message" className="block text-sm font-medium text-brand-dark dark:text-slate-300 mb-2">
+            <label
+              htmlFor="partnership-message"
+              className="block text-sm font-medium text-brand-dark dark:text-slate-300 mb-2"
+            >
               Your Message
             </label>
             <textarea
@@ -68,16 +82,16 @@ const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, re
               required
             />
             <div className="mt-6 flex justify-end gap-3">
-              <button 
-                type="button" 
-                onClick={onClose} 
+              <button
+                type="button"
+                onClick={onClose}
                 className="px-4 py-2 text-sm font-medium text-brand-secondary dark:text-slate-300 bg-gray-200 dark:bg-slate-700 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
-                disabled={isSubmitting || !message.trim()} 
+              <button
+                type="submit"
+                disabled={isSubmitting || !message.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-brand-blue rounded-md hover:bg-opacity-90 disabled:bg-opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
               >
                 <Icon name="message" className="h-5 w-5" />

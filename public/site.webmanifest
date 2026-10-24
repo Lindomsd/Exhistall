@@ -7,24 +7,24 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#F4F7FC",
-  "theme_color": "#071D49",
+  "background_color": "#FFF9EC",
+  "theme_color": "#102653",
   "categories": ["shopping", "business"],
   "icons": [
     {
-      "src": "/brand/exhistall-icon-512.png",
+      "src": "/favicon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/brand/exhistall-apple-touch-icon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/brand/apple-touch-icon.png",
+      "src": "/favicon-180.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"

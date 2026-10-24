@@ -28,7 +28,7 @@ export default function SetupNotice() {
           </li>
           <li className="rounded-xl border border-white/15 bg-white/5 p-5">
             <p className="font-bold text-brand-gold">2 · Add public environment values</p>
-            <pre className="mt-2 overflow-x-auto rounded-lg bg-[#061738] p-3 text-sm leading-relaxed text-blue-100">
+            <pre className="mt-2 overflow-x-auto rounded-lg bg-[#091B42] p-3 text-sm leading-relaxed text-blue-100">
               {`VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key`}
             </pre>

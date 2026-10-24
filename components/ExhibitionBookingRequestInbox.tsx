@@ -64,7 +64,7 @@ export default function ExhibitionBookingRequestInbox({
   return (
     <section className="space-y-5">
       <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
-        <p className="text-xs font-extrabold tracking-[.18em] text-[#b84c32] uppercase">
+        <p className="text-xs font-extrabold tracking-[.18em] text-[#e2a316] uppercase">
           Private exhibitor leads
         </p>
         <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3">
@@ -180,7 +180,7 @@ export default function ExhibitionBookingRequestInbox({
         </div>
       ) : (
         <div className="rounded-lg bg-white p-10 text-center shadow-lg dark:bg-slate-800">
-          <Icon name="ticket" className="mx-auto h-10 w-10 text-[#b84c32]" />
+          <Icon name="ticket" className="mx-auto h-10 w-10 text-[#e2a316]" />
           <h3 className="mt-3 text-xl font-bold">No booking requests yet</h3>
           <p className="mt-2 text-sm text-brand-secondary dark:text-slate-400">
             Published halls show a “Book a stall” button to signed-in applicants.

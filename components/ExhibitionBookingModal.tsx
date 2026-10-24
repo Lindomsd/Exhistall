@@ -109,7 +109,7 @@ export default function ExhibitionBookingModal({
             <button
               type="button"
               onClick={resetAndClose}
-              className="mt-7 rounded-lg bg-brand-blue px-5 py-3 font-bold text-white hover:bg-blue-800"
+              className="mt-7 rounded-lg bg-brand-blue px-5 py-3 font-bold text-white hover:bg-brand-midnight"
             >
               Done
             </button>
@@ -118,7 +118,7 @@ export default function ExhibitionBookingModal({
           <Fragment>
             <div className="flex items-start justify-between border-b border-slate-200 p-6 dark:border-slate-700">
               <div>
-                <p className="text-xs font-extrabold tracking-[.18em] text-[#b84c32] uppercase">
+                <p className="text-xs font-extrabold tracking-[.18em] text-[#e2a316] uppercase">
                   Exhibitor application
                 </p>
                 <h2 className="market-display-font mt-1 text-2xl font-bold">Book a stall</h2>
