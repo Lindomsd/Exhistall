@@ -1,0 +1,25 @@
+{
+  "name": "Exhistall — The digital marketplace",
+  "short_name": "Exhistall",
+  "description": "Discover independent businesses, products, services and exhibition halls.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F7FC",
+  "theme_color": "#071D49",
+  "icons": [
+    {
+      "src": "/brand/exhistall-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/exhistall-apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
