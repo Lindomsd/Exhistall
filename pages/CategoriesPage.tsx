@@ -12,20 +12,30 @@ interface CategoriesPageProps {
 }
 
 const categories = [
-    { name: 'Food & Drink', icon: 'food' },
-    { name: 'Fashion & Apparel', icon: 'fashion' },
-    { name: 'Digital Services', icon: 'digital' },
-    { name: 'Home & Craft', icon: 'craft' },
-    { name: 'Health & Beauty', icon: 'health' },
-    { name: 'Consulting', icon: 'consulting' },
-    { name: 'Arts & Entertainment', icon: 'ticket' },
-    { name: 'Automotive', icon: 'truck' },
+  { name: 'Food & Drink', icon: 'food' },
+  { name: 'Fashion & Apparel', icon: 'fashion' },
+  { name: 'Digital Services', icon: 'digital' },
+  { name: 'Home & Craft', icon: 'craft' },
+  { name: 'Health & Beauty', icon: 'health' },
+  { name: 'Consulting', icon: 'consulting' },
+  { name: 'Arts & Entertainment', icon: 'ticket' },
+  { name: 'Automotive', icon: 'truck' },
 ];
 
-const CategoriesPage: React.FC<CategoriesPageProps> = ({ onNavigate, onSearch, currentUser, onLogout }) => {
+const CategoriesPage: React.FC<CategoriesPageProps> = ({
+  onNavigate,
+  onSearch,
+  currentUser,
+  onLogout,
+}) => {
   return (
     <>
-      <Header onNavigate={onNavigate} onSearch={onSearch} currentUser={currentUser} onLogout={onLogout} />
+      <Header
+        onNavigate={onNavigate}
+        onSearch={onSearch}
+        currentUser={currentUser}
+        onLogout={onLogout}
+      />
       <main className="bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl font-extrabold text-center mb-12">Browse Categories</h1>
@@ -36,7 +46,10 @@ const CategoriesPage: React.FC<CategoriesPageProps> = ({ onNavigate, onSearch, c
                 onClick={() => onNavigate('marketplace')}
                 className="flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-800 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-transform duration-300"
               >
-                <Icon name={category.icon} className="h-12 w-12 text-brand-blue dark:text-brand-gold mb-4" />
+                <Icon
+                  name={category.icon}
+                  className="h-12 w-12 text-brand-blue dark:text-brand-gold mb-4"
+                />
                 <span className="text-lg font-semibold text-center">{category.name}</span>
               </button>
             ))}

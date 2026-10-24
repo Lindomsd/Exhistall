@@ -3,32 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#071D49" />
-    <meta name="description" content="Exhistall is the digital marketplace for discovering independent businesses, products, services and exhibition halls." />
+    <meta name="theme-color" content="#102653" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      name="description"
+      content="Exhistall is the digital marketplace for discovering independent businesses, products, services and exhibition halls."
+    />
     <meta name="application-name" content="Exhistall" />
+    <meta name="author" content="Exhistall" />
+    <link rel="canonical" href="https://exhistall.netlify.app/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Exhistall" />
+    <meta property="og:locale" content="en_ZA" />
+    <meta property="og:url" content="https://exhistall.netlify.app/" />
     <meta property="og:title" content="Exhistall — The digital marketplace" />
-    <meta property="og:description" content="Walk into a lively digital market of independent businesses, products, services and exhibition halls." />
-    <meta property="og:image" content="/social/exhistall-og.svg" />
+    <meta
+      property="og:description"
+      content="Walk into a lively digital market of independent businesses, products, services and exhibition halls."
+    />
+    <meta property="og:image" content="https://exhistall.netlify.app/social/exhistall-og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="540" />
+    <meta property="og:image:alt" content="Exhistall — a welcoming digital marketplace" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Exhistall — The digital marketplace" />
-    <meta name="twitter:description" content="Discover independent businesses, products, services and exhibition halls." />
-    <meta name="twitter:image" content="/social/exhistall-og.svg" />
+    <meta
+      name="twitter:description"
+      content="Discover independent businesses, products, services and exhibition halls."
+    />
+    <meta name="twitter:image" content="https://exhistall.netlify.app/social/exhistall-og.png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/brand/exhistall-apple-touch-icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <title>Exhistall — The digital marketplace</title>
-    <script type="importmap">
+    <script type="application/ld+json">
       {
-        "imports": {
-          "react/": "https://aistudiocdn.com/react@^19.2.0/",
-          "react": "https://aistudiocdn.com/react@^19.2.0",
-          "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Exhistall",
+        "url": "https://exhistall.netlify.app/",
+        "description": "The digital marketplace for independent businesses, products, services and exhibition halls.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Exhistall",
+          "url": "https://exhistall.netlify.app/"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://exhistall.netlify.app/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
         }
       }
     </script>
   </head>
-  <body>
+  <body class="bg-brand-light text-brand-dark">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

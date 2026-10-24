@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -16,7 +15,10 @@ const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ pageTitle, onNavigate
       <main className="flex-grow bg-brand-light dark:bg-brand-dark">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="max-w-2xl mx-auto">
-            <Icon name="briefcase" className="h-16 w-16 mx-auto text-brand-blue dark:text-brand-gold mb-4" />
+            <Icon
+              name="briefcase"
+              className="h-16 w-16 mx-auto text-brand-blue dark:text-brand-gold mb-4"
+            />
             <h1 className="text-4xl md:text-5xl font-extrabold text-brand-dark dark:text-brand-light capitalize">
               {pageTitle.replace('-', ' ')}
             </h1>
@@ -26,7 +28,7 @@ const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ pageTitle, onNavigate
             <div className="mt-8">
               <button
                 onClick={() => onNavigate('home')}
-                className="bg-brand-gold text-brand-blue font-bold py-3 px-6 rounded-lg hover:bg-yellow-300 transition-colors"
+                className="bg-brand-gold text-brand-blue font-bold py-3 px-6 rounded-lg hover:bg-brand-sunlit transition-colors"
               >
                 Go Back to Home
               </button>
