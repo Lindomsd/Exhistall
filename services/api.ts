@@ -1,15 +1,12 @@
 import { requireSupabase } from '../supabaseClient';
 import type {
   Exhibition,
-  ExhibitionBookingPackage,
   ExhibitionBookingRequest,
   ExhibitionBookingRequestInput,
   ExhibitionBookingStatus,
   ExhibitionInput,
-  ExhibitionStatus,
   GalleryItem,
   PartnershipRequest,
-  PreferredContactMethod,
   Product,
   ProductInput,
   Promotion,

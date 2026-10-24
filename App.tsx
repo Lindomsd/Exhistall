@@ -1,1 +1,797 @@
-import{jsx as s}from"react/jsx-runtime";import{useState as d,useEffect as G}from"react";import M from"./pages/HomePage";import Et from"./pages/StallPage";import qt from"./pages/CategoriesPage";import Lt from"./pages/MarketplacePage";import vt from"./pages/CreateStallPage";import kt from"./pages/AdminDashboardPage";import Nt from"./pages/AboutPage";import At from"./pages/BlogPage";import Ct from"./pages/ExhibitionsPage";import Bt from"./pages/HelpCenterPage";import It from"./pages/JobsPage";import A from"./pages/LegalPage";import V from"./pages/NetworkingPage";import Qt from"./pages/PricingPage";import Ft from"./pages/LoginPage";import Dt from"./pages/StallholderDashboardPage";import Tt from"./pages/AdminMfaPage";import{api as o}from"./services/api";const Gt=()=>{const[g,h]=d("home"),[C,R]=d(null),[S,P]=d([]),[z,k]=d([]),[H,B]=d([]),[j,J]=d(!0),[I,b]=d([]),[O,w]=d([]),[Y,E]=d([]),[$,N]=d([]),[K,Q]=d([]),[i,x]=d(null),[W,F]=d(!0),[X,Z]=d(""),[_,D]=d(null),[q,m]=d(null),[T,L]=d(!1);G(()=>{(async()=>{F(!0);try{const[e,a]=await Promise.all([o.getCurrentUser(),o.getStalls()]);x(e),P(a);try{k(await o.getExhibitions())}catch(n){console.error("Failed to load public exhibition halls:",n),k([])}finally{J(!1)}if(e?.role==="admin"){const n=await o.getAdminMfaState();L(n.verified),n.verified&&await p(e)}else e&&await p(e)}catch(e){console.error("Failed to initialize app data:",e)}finally{F(!1)}})()},[]);const p=async t=>{if(t.role==="admin"){const[e,a,n,l]=await Promise.all([o.getAllStallsForAdmin(),o.getUsers(),o.getAllExhibitionsForAdmin(),o.getExhibitionBookingRequestsForAdmin()]);b(e),Q(a),B(n),N(l)}if(t.stallId){const e=await o.getStallById(t.stallId);m(e);try{w(await o.getPartnershipRequestsForStall(t.stallId))}catch(a){console.error("Failed to load partnership requests:",a),w([])}try{E(await o.getQuoteRequestsForStall(t.stallId))}catch(a){console.error("Failed to load quote requests:",a),E([])}}},u=t=>{if(Z(t),!t.trim()){D(null),h("home");return}const e=S.filter(a=>a.name.toLowerCase().includes(t.toLowerCase())||a.category.toLowerCase().includes(t.toLowerCase()));D(e),h("searchResults"),window.scrollTo(0,0)},r=(t,e)=>{if(t==="admin"&&i?.role!=="admin"){h("login");return}if(t==="admin"&&!T){h("admin-mfa");return}if(t==="stall"&&e){const a=I.find(n=>n.id===e)||S.find(n=>n.id===e);a&&f(a)}else h(t),R(null);window.scrollTo(0,0)},f=t=>{R(t),h("stall"),window.scrollTo(0,0)},tt=()=>{R(null),h("home"),window.scrollTo(0,0)},et=async(t,e)=>{if(!q){alert("You must have a stall to propose a partnership.");return}const a=await o.proposePartnership(q,t,e);w(n=>[...n,a])},at=async(t,e)=>{let a=null;try{a=await o.login(t,e)}catch(n){return console.error("Login failed:",n),!1}return a?(x(a),a.role==="admin"?(L(!1),r("admin-mfa")):a.stallId?(await p(a),r("stallholder-dashboard")):(await p(a),r("home")),!0):!1},nt=async(t,e,a)=>{try{const n=await o.signUp(t,e,a);return n.user&&(x(n.user),await p(n.user),r(n.user.stallId?"stallholder-dashboard":"home")),{success:!0,confirmationRequired:n.confirmationRequired}}catch(n){return console.error("Sign-up failed:",n),{success:!1,confirmationRequired:!1,message:n instanceof Error?n.message:"Account creation failed."}}},c=async()=>{await o.logout(),x(null),m(null),w([]),E([]),N([]),b([]),Q([]),L(!1),r("home")},ot=async()=>{!i||i.role!=="admin"||(L(!0),await p(i),r("admin"))},it=async(t,e)=>{const a=await o.updateStallStatus(t,e);a?(b(n=>n.map(l=>l.id===t?a:l)),a.status==="active"?P(n=>n.some(v=>v.id===t)?n.map(v=>v.id===t?a:v):[...n,a]):P(n=>n.filter(l=>l.id!==t)),alert(`Stall status updated to ${e}.`)):alert("Failed to update stall status.")},rt=async t=>{const e=await o.createStall(t);if(e){b(n=>[...n,e]);const a=await o.getCurrentUser();a&&(x(a),await p(a))}},st=async(t,e)=>{const a=await o.updateStall(t,e);a&&(m(a),b(n=>n.map(l=>l.id===t?a:l)),P(n=>n.map(l=>l.id===t?a:l)))},lt=async(t,e)=>{const a=await o.addProduct(t,e);a&&m(a)},ct=async(t,e,a)=>{const n=await o.updateProduct(t,e,a);n&&m(n)},ut=async(t,e)=>{const a=await o.deleteProduct(t,e);a&&m(a)},dt=async(t,e)=>{y(await o.addPromotion(t,e))},gt=async(t,e,a)=>{y(await o.updatePromotion(t,e,a))},ht=async(t,e)=>{y(await o.deletePromotion(t,e))},y=t=>{t&&(m(t),b(e=>e.map(a=>a.id===t.id?t:a)),P(e=>e.map(a=>a.id===t.id?t:a)),R(e=>e?.id===t.id?t:e))},mt=async(t,e)=>{y(await o.addGalleryItem(t,e))},pt=async(t,e)=>{y(await o.deleteGalleryItem(t,e.id))},ft=async(t,e)=>{const a=await o.updatePartnershipRequestStatus(t,e);a&&w(n=>n.map(l=>l.id===t?a:l))},St=async(t,e)=>{await o.createQuoteRequest(t,e)},bt=async(t,e)=>{const a=await o.updateQuoteRequestStatus(t,e);a&&E(n=>n.map(l=>l.id===t?a:l))},Mt=async(t,e)=>{if(!i)throw new Error("Please sign in before requesting an exhibition stall.");await o.createExhibitionBookingRequest(t,e)},Pt=async(t,e)=>{const a=await o.updateExhibitionBookingRequestStatus(t,e);a&&N(n=>n.map(l=>l.id===t?a:l))},U=async()=>{const[t,e]=await Promise.all([o.getExhibitions(),i?.role==="admin"?o.getAllExhibitionsForAdmin():Promise.resolve(null)]);k(t),e&&B(e)},wt=async t=>{await o.createExhibition(t),await U()},xt=async(t,e)=>{await o.updateExhibition(t,e),await U()},yt=async t=>{await o.deleteExhibition(t),await U()},Ut=async(t,e,a,n)=>{await o.assignStallToExhibition(t,e,a,n),await U()},Rt=async(t,e)=>{await o.removeStallFromExhibition(t,e),await U()};return G(()=>{document.body.className="bg-brand-light dark:bg-brand-dark text-brand-dark dark:text-brand-light"},[]),W?s("div",{className:"min-h-screen flex items-center justify-center bg-brand-light dark:bg-brand-dark",children:s("div",{className:"text-center",children:s("p",{className:"text-xl font-semibold",children:"Loading Exhistalls..."})})}):s("div",{className:"min-h-screen font-sans",children:(()=>{if(g==="login")return s(Ft,{onLogin:at,onSignUp:nt,onNavigate:r});if(g==="admin-mfa"&&i?.role==="admin")return s(Tt,{currentUser:i,onLogout:c,onVerified:ot,onNavigate:r});if(g==="admin"&&i?.role==="admin"&&T)return s(kt,{stalls:I,users:K,onNavigate:r,currentUser:i,onLogout:c,onUpdateStallStatus:it,exhibitions:H,onCreateExhibition:wt,onUpdateExhibition:xt,onDeleteExhibition:yt,onAssignStallToExhibition:Ut,onRemoveStallFromExhibition:Rt,bookingRequests:$,onUpdateBookingRequestStatus:Pt,onSearch:u});if(g==="stallholder-dashboard"&&q)return s(Dt,{stall:q,partnershipRequests:O,quoteRequests:Y,onNavigate:r,currentUser:i,onLogout:c,onSearch:u,onUpdateStall:st,onAddProduct:lt,onUpdateProduct:ct,onDeleteProduct:ut,onAddPromotion:dt,onUpdatePromotion:gt,onDeletePromotion:ht,onAddGalleryItem:mt,onDeleteGalleryItem:pt,onUpdatePartnershipStatus:ft,onUpdateQuoteRequestStatus:bt});if(g==="searchResults")return s(V,{stalls:_||[],onStallClick:f,onNavigate:r,onSearch:u,pageTitle:"Search Results",searchQuery:X,currentUser:i,onLogout:c});if(g==="stall"&&C)return s(Et,{stall:C,onBack:tt,currentUser:i,onProposePartnership:et,onCreateQuoteRequest:St,onNavigate:r,onSearch:u,onLogout:c});switch(g){case"home":return s(M,{stalls:S,onStallClick:f,onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"categories":return s(qt,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"marketplace":return s(Lt,{stalls:S,onStallClick:f,onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"create-stall":return s(vt,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c,onCreateStall:rt});case"networking":return s(V,{stalls:S,onStallClick:f,onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"exhibitions":return s(Ct,{exhibitions:z,isLoading:j,onStallClick:f,onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"pricing":return s(Qt,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"help":case"guides":return s(Bt,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"about":return s(Nt,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"blog":return s(At,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"jobs":return s(It,{onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"claim":return s(A,{pageType:"claim",onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"privacy":return s(A,{pageType:"privacy",onNavigate:r,onSearch:u,currentUser:i,onLogout:c});case"terms":return s(A,{pageType:"terms",onNavigate:r,onSearch:u,currentUser:i,onLogout:c});default:return s(M,{stalls:S,onStallClick:f,onNavigate:r,onSearch:u,currentUser:i,onLogout:c})}})()})};var le=Gt;export{le as default};
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
+import { api } from './services/api';
+import type {
+  Exhibition,
+  ExhibitionBookingRequest,
+  ExhibitionInput,
+  PartnershipRequest,
+  ProductInput,
+  PromotionInput,
+  QuoteRequest,
+  QuoteRequestInput,
+  Stall,
+  StallInput,
+  User,
+} from './types';
+
+// Route-level code splitting keeps the initial download small.
+const HomePage = lazy(() => import('./pages/HomePage'));
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
+const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
+const ExhibitionsPage = lazy(() => import('./pages/ExhibitionsPage'));
+const NetworkingPage = lazy(() => import('./pages/NetworkingPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const HelpCenterPage = lazy(() => import('./pages/HelpCenterPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const JobsPage = lazy(() => import('./pages/JobsPage'));
+const LegalPage = lazy(() => import('./pages/LegalPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const CreateStallPage = lazy(() => import('./pages/CreateStallPage'));
+const StallPage = lazy(() => import('./pages/StallPage'));
+const StallholderDashboardPage = lazy(() => import('./pages/StallholderDashboardPage'));
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
+const AdminMfaPage = lazy(() => import('./pages/AdminMfaPage'));
+
+/** Map a logical page key (as used by pages/Header) to a real URL. */
+function hrefFor(page: string, stallId?: string): string {
+  switch (page) {
+    case 'home':
+      return '/';
+    case 'marketplace':
+      return '/marketplace';
+    case 'categories':
+      return '/categories';
+    case 'exhibitions':
+      return '/exhibitions';
+    case 'networking':
+      return '/networking';
+    case 'pricing':
+      return '/pricing';
+    case 'help':
+    case 'guides':
+      return '/help';
+    case 'about':
+      return '/about';
+    case 'blog':
+      return '/blog';
+    case 'jobs':
+      return '/jobs';
+    case 'claim':
+      return '/claim';
+    case 'privacy':
+      return '/privacy';
+    case 'terms':
+      return '/terms';
+    case 'login':
+      return '/login';
+    case 'create-stall':
+      return '/open-a-stall';
+    case 'admin':
+      return '/admin';
+    case 'admin-mfa':
+      return '/admin/mfa';
+    case 'stallholder-dashboard':
+      return '/dashboard';
+    case 'searchResults':
+      return '/search';
+    case 'stall':
+      return stallId ? `/stall/${stallId}` : '/';
+    default:
+      return '/';
+  }
+}
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-lg font-semibold opacity-70">Loading…</p>
+    </div>
+  );
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+interface StallRouteProps {
+  stalls: Stall[];
+  onProposePartnership: (target: Stall, message: string) => Promise<void>;
+  onCreateQuoteRequest: (stallId: string, input: QuoteRequestInput) => Promise<void>;
+  onNavigate: (page: string, stallId?: string) => void;
+  onSearch: (query: string) => void;
+  onLogout: () => void;
+  currentUser: User | null;
+}
+
+function StallRoute({
+  stalls,
+  onProposePartnership,
+  onCreateQuoteRequest,
+  onNavigate,
+  onSearch,
+  onLogout,
+  currentUser,
+}: StallRouteProps) {
+  const { stallId } = useParams();
+  const stall = stalls.find((s) => s.id === stallId);
+  if (!stall) return <Navigate to="/" replace />;
+  return (
+    <StallPage
+      stall={stall}
+      onBack={() => onNavigate('home')}
+      currentUser={currentUser}
+      onProposePartnership={onProposePartnership}
+      onCreateQuoteRequest={onCreateQuoteRequest}
+      onNavigate={onNavigate}
+      onSearch={onSearch}
+      onLogout={onLogout}
+    />
+  );
+}
+
+interface SearchRouteProps {
+  allStalls: Stall[];
+  onStallClick: (stall: Stall) => void;
+  onNavigate: (page: string, stallId?: string) => void;
+  onSearch: (query: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
+}
+
+function SearchRoute({
+  allStalls,
+  onStallClick,
+  onNavigate,
+  onSearch,
+  currentUser,
+  onLogout,
+}: SearchRouteProps) {
+  const [params] = useSearchParams();
+  const query = params.get('q') ?? '';
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return allStalls.filter(
+      (s) => s.name.toLowerCase().includes(q) || (s.category ?? '').toLowerCase().includes(q),
+    );
+  }, [allStalls, query]);
+  return (
+    <NetworkingPage
+      stalls={results}
+      onStallClick={onStallClick}
+      onNavigate={onNavigate}
+      onSearch={onSearch}
+      pageTitle="Search Results"
+      searchQuery={query}
+      currentUser={currentUser}
+      onLogout={onLogout}
+    />
+  );
+}
+
+function AppShell() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [publicStalls, setPublicStalls] = useState<Stall[]>([]);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [publicExhibitionsLoading, setPublicExhibitionsLoading] = useState(true);
+  const [adminStalls, setAdminStalls] = useState<Stall[]>([]);
+  const [adminExhibitions, setAdminExhibitions] = useState<Exhibition[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [myStall, setMyStall] = useState<Stall | null>(null);
+  const [partnershipRequests, setPartnershipRequests] = useState<PartnershipRequest[]>([]);
+  const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
+  const [bookingRequests, setBookingRequests] = useState<ExhibitionBookingRequest[]>([]);
+  const [mfaVerified, setMfaVerified] = useState(false);
+  const [appLoading, setAppLoading] = useState(true);
+  const [extraStalls, setExtraStalls] = useState<Stall[]>([]);
+  const [attemptedStalls, setAttemptedStalls] = useState<Set<string>>(new Set());
+
+  const loadStallholderData = useCallback(async (user: User) => {
+    if (user.role === 'admin') {
+      const [stalls, profileList, allExhibitions, requests] = await Promise.all([
+        api.getAllStallsForAdmin(),
+        api.getUsers(),
+        api.getAllExhibitionsForAdmin(),
+        api.getExhibitionBookingRequestsForAdmin(),
+      ]);
+      setAdminStalls(stalls);
+      setUsers(profileList);
+      setAdminExhibitions(allExhibitions);
+      setBookingRequests(requests);
+    }
+    if (user.stallId) {
+      const stall = await api.getStallById(user.stallId);
+      setMyStall(stall);
+      setExtraStalls((prev) =>
+        stall && !prev.some((s) => s.id === stall.id) ? [...prev, stall] : prev,
+      );
+      try {
+        setPartnershipRequests(await api.getPartnershipRequestsForStall(user.stallId));
+      } catch (error) {
+        console.error('Failed to load partnership requests:', error);
+        setPartnershipRequests([]);
+      }
+      try {
+        setQuoteRequests(await api.getQuoteRequestsForStall(user.stallId));
+      } catch (error) {
+        console.error('Failed to load quote requests:', error);
+        setQuoteRequests([]);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setAppLoading(true);
+      try {
+        const [user, stalls] = await Promise.all([api.getCurrentUser(), api.getStalls()]);
+        if (!active) return;
+        setCurrentUser(user);
+        setPublicStalls(stalls);
+        try {
+          setExhibitions(await api.getExhibitions());
+        } catch (error) {
+          console.error('Failed to load public exhibition halls:', error);
+          setExhibitions([]);
+        } finally {
+          if (active) setPublicExhibitionsLoading(false);
+        }
+        if (user?.role === 'admin') {
+          const state = await api.getAdminMfaState();
+          if (!active) return;
+          setMfaVerified(state.verified);
+          if (state.verified) await loadStallholderData(user);
+        } else if (user) {
+          await loadStallholderData(user);
+        }
+      } catch (error) {
+        console.error('Failed to initialize app data:', error);
+      } finally {
+        if (active) setAppLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [loadStallholderData]);
+
+  // Resolve stalls that a deep link points at but that aren't in the loaded lists.
+  useEffect(() => {
+    const match = location.pathname.match(/^\/stall\/([^/]+)$/);
+    if (!match) return;
+    const id = match[1];
+    if (
+      publicStalls.some((s) => s.id === id) ||
+      adminStalls.some((s) => s.id === id) ||
+      extraStalls.some((s) => s.id === id) ||
+      myStall?.id === id ||
+      attemptedStalls.has(id)
+    ) {
+      return;
+    }
+    setAttemptedStalls((prev) => new Set(prev).add(id));
+    let active = true;
+    api
+      .getStallById(id)
+      .then((stall) => {
+        if (active && stall) setExtraStalls((prev) => [...prev, stall]);
+      })
+      .catch((error) => console.error('Failed to load stall:', error));
+    return () => {
+      active = false;
+    };
+  }, [location.pathname, publicStalls, adminStalls, extraStalls, myStall, attemptedStalls]);
+
+  const allStalls = useMemo(
+    () => [...publicStalls, ...adminStalls, ...extraStalls],
+    [publicStalls, adminStalls, extraStalls],
+  );
+
+  const applyStallUpdate = useCallback((updated: Stall | null) => {
+    if (!updated) return;
+    setMyStall((prev) => (prev && prev.id === updated.id ? updated : prev));
+    setAdminStalls((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    setPublicStalls((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    setExtraStalls((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+  }, []);
+
+  const handleNavigate = useCallback(
+    (page: string, stallId?: string) => {
+      if (page === 'admin') {
+        if (currentUser?.role !== 'admin') {
+          navigate('/login');
+          return;
+        }
+        if (!mfaVerified) {
+          navigate('/admin/mfa');
+          return;
+        }
+      }
+      navigate(hrefFor(page, stallId));
+    },
+    [currentUser, mfaVerified, navigate],
+  );
+
+  const handleStallClick = useCallback(
+    (stall: Stall) => navigate(`/stall/${stall.id}`),
+    [navigate],
+  );
+
+  const handleSearch = useCallback(
+    (query: string) => {
+      if (!query.trim()) {
+        navigate('/');
+        return;
+      }
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    },
+    [navigate],
+  );
+
+  const handleLogin = useCallback(
+    async (email: string, password: string): Promise<boolean> => {
+      let user: User | null;
+      try {
+        user = await api.login(email, password);
+      } catch (error) {
+        console.error('Login failed:', error);
+        return false;
+      }
+      if (!user) return false;
+      setCurrentUser(user);
+      if (user.role === 'admin') {
+        setMfaVerified(false);
+        navigate('/admin/mfa');
+      } else if (user.stallId) {
+        await loadStallholderData(user);
+        navigate('/dashboard');
+      } else {
+        await loadStallholderData(user);
+        navigate('/');
+      }
+      return true;
+    },
+    [loadStallholderData, navigate],
+  );
+
+  const handleSignUp = useCallback(
+    async (
+      name: string,
+      email: string,
+      password: string,
+    ): Promise<{ success: boolean; confirmationRequired: boolean; message?: string }> => {
+      try {
+        const result = await api.signUp(name, email, password);
+        if (result.user) {
+          setCurrentUser(result.user);
+          await loadStallholderData(result.user);
+          navigate(result.user.stallId ? '/dashboard' : '/');
+        }
+        return { success: true, confirmationRequired: result.confirmationRequired };
+      } catch (error) {
+        console.error('Sign-up failed:', error);
+        return {
+          success: false,
+          confirmationRequired: false,
+          message: error instanceof Error ? error.message : 'Account creation failed.',
+        };
+      }
+    },
+    [loadStallholderData, navigate],
+  );
+
+  const handleLogout = useCallback(async () => {
+    await api.logout();
+    setCurrentUser(null);
+    setMyStall(null);
+    setPartnershipRequests([]);
+    setQuoteRequests([]);
+    setBookingRequests([]);
+    setAdminStalls([]);
+    setUsers([]);
+    setMfaVerified(false);
+    navigate('/');
+  }, [navigate]);
+
+  const handleMfaVerified = useCallback(async () => {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    setMfaVerified(true);
+    await loadStallholderData(currentUser);
+    navigate('/admin');
+  }, [currentUser, loadStallholderData, navigate]);
+
+  const handleUpdateStallStatus = useCallback(async (stallId: string, status: Stall['status']) => {
+    const updated = await api.updateStallStatus(stallId, status);
+    if (!updated) {
+      alert('Failed to update stall status.');
+      return;
+    }
+    setAdminStalls((prev) => prev.map((s) => (s.id === stallId ? updated : s)));
+    if (status === 'active') {
+      setPublicStalls((prev) =>
+        prev.some((s) => s.id === stallId)
+          ? prev.map((s) => (s.id === stallId ? updated : s))
+          : [...prev, updated],
+      );
+    } else {
+      setPublicStalls((prev) => prev.filter((s) => s.id !== stallId));
+    }
+    alert(`Stall status updated to ${status}.`);
+  }, []);
+
+  const handleCreateStall = useCallback(
+    async (input: StallInput) => {
+      const created = await api.createStall(input);
+      if (!created) return;
+      setAdminStalls((prev) => [...prev, created]);
+      const fresh = await api.getCurrentUser();
+      if (fresh) {
+        setCurrentUser(fresh);
+        await loadStallholderData(fresh);
+      }
+    },
+    [loadStallholderData],
+  );
+
+  const handleUpdateStall = useCallback(
+    async (stallId: string, input: Partial<StallInput>) => {
+      const updated = await api.updateStall(stallId, input);
+      if (updated) applyStallUpdate(updated);
+    },
+    [applyStallUpdate],
+  );
+
+  const handleAddProduct = useCallback(
+    async (stallId: string, input: ProductInput) =>
+      applyStallUpdate(await api.addProduct(stallId, input)),
+    [applyStallUpdate],
+  );
+  const handleUpdateProduct = useCallback(
+    async (stallId: string, productId: string, input: Partial<ProductInput>) =>
+      applyStallUpdate(await api.updateProduct(stallId, productId, input)),
+    [applyStallUpdate],
+  );
+  const handleDeleteProduct = useCallback(
+    async (stallId: string, productId: string) =>
+      applyStallUpdate(await api.deleteProduct(stallId, productId)),
+    [applyStallUpdate],
+  );
+
+  const handleAddPromotion = useCallback(
+    async (stallId: string, input: PromotionInput) =>
+      applyStallUpdate(await api.addPromotion(stallId, input)),
+    [applyStallUpdate],
+  );
+  const handleUpdatePromotion = useCallback(
+    async (stallId: string, promotionId: string, input: Partial<PromotionInput>) =>
+      applyStallUpdate(await api.updatePromotion(stallId, promotionId, input)),
+    [applyStallUpdate],
+  );
+  const handleDeletePromotion = useCallback(
+    async (stallId: string, promotionId: string) =>
+      applyStallUpdate(await api.deletePromotion(stallId, promotionId)),
+    [applyStallUpdate],
+  );
+
+  const handleAddGalleryItem = useCallback(
+    async (stallId: string, url: string) =>
+      applyStallUpdate(await api.addGalleryItem(stallId, url)),
+    [applyStallUpdate],
+  );
+  const handleDeleteGalleryItem = useCallback(
+    async (stallId: string, item: { id: string }) =>
+      applyStallUpdate(await api.deleteGalleryItem(stallId, item.id)),
+    [applyStallUpdate],
+  );
+
+  const handleUpdatePartnershipStatus = useCallback(
+    async (id: string, status: PartnershipRequest['status']) => {
+      const updated = await api.updatePartnershipRequestStatus(id, status);
+      if (updated) setPartnershipRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    },
+    [],
+  );
+
+  const handleCreateQuoteRequest = useCallback(
+    (stallId: string, input: QuoteRequestInput) => api.createQuoteRequest(stallId, input),
+    [],
+  );
+  const handleUpdateQuoteRequestStatus = useCallback(
+    async (id: string, status: QuoteRequest['status']) => {
+      const updated = await api.updateQuoteRequestStatus(id, status);
+      if (updated) setQuoteRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    },
+    [],
+  );
+
+  const handleCreateBookingRequest = useCallback(
+    async (
+      exhibitionId: string,
+      input: Parameters<typeof api.createExhibitionBookingRequest>[1],
+    ) => {
+      if (!currentUser) throw new Error('Please sign in before requesting an exhibition stall.');
+      await api.createExhibitionBookingRequest(exhibitionId, input);
+    },
+    [currentUser],
+  );
+
+  const handleUpdateBookingRequestStatus = useCallback(
+    async (id: string, status: ExhibitionBookingRequest['status']) => {
+      const updated = await api.updateExhibitionBookingRequestStatus(id, status);
+      if (updated) setBookingRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    },
+    [],
+  );
+
+  const refreshExhibitions = useCallback(async () => {
+    const [publicList, adminList] = await Promise.all([
+      api.getExhibitions(),
+      currentUser?.role === 'admin' ? api.getAllExhibitionsForAdmin() : Promise.resolve(null),
+    ]);
+    setExhibitions(publicList);
+    if (adminList) setAdminExhibitions(adminList);
+  }, [currentUser]);
+
+  const handleCreateExhibition = useCallback(
+    async (input: ExhibitionInput) => {
+      await api.createExhibition(input);
+      await refreshExhibitions();
+    },
+    [refreshExhibitions],
+  );
+  const handleUpdateExhibition = useCallback(
+    async (id: string, input: Partial<ExhibitionInput>) => {
+      await api.updateExhibition(id, input);
+      await refreshExhibitions();
+    },
+    [refreshExhibitions],
+  );
+  const handleDeleteExhibition = useCallback(
+    async (id: string) => {
+      await api.deleteExhibition(id);
+      await refreshExhibitions();
+    },
+    [refreshExhibitions],
+  );
+  const handleAssignStallToExhibition = useCallback(
+    async (exhibitionId: string, stallId: string, boothLabel: string, sortOrder: number) => {
+      await api.assignStallToExhibition(exhibitionId, stallId, boothLabel, sortOrder);
+      await refreshExhibitions();
+    },
+    [refreshExhibitions],
+  );
+  const handleRemoveStallFromExhibition = useCallback(
+    async (exhibitionId: string, stallId: string) => {
+      await api.removeStallFromExhibition(exhibitionId, stallId);
+      await refreshExhibitions();
+    },
+    [refreshExhibitions],
+  );
+
+  const handleProposePartnership = useCallback(
+    async (target: Stall, message: string) => {
+      if (!myStall) {
+        alert('You must have a stall to propose a partnership.');
+        return;
+      }
+      const created = await api.proposePartnership(myStall, target, message);
+      setPartnershipRequests((prev) => [...prev, created]);
+    },
+    [myStall],
+  );
+
+  if (appLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brand-light text-brand-dark">
+        <p className="text-xl font-semibold">Loading Exhistall…</p>
+      </div>
+    );
+  }
+
+  const commonProps = {
+    onNavigate: handleNavigate,
+    currentUser,
+    onLogout: handleLogout,
+    onSearch: handleSearch,
+  };
+
+  return (
+    <div className="min-h-screen font-sans">
+      <ScrollToTop />
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage stalls={publicStalls} onStallClick={handleStallClick} {...commonProps} />
+            }
+          />
+          <Route
+            path="/marketplace"
+            element={
+              <MarketplacePage
+                stalls={publicStalls}
+                onStallClick={handleStallClick}
+                {...commonProps}
+              />
+            }
+          />
+          <Route path="/categories" element={<CategoriesPage {...commonProps} />} />
+          <Route
+            path="/exhibitions"
+            element={
+              <ExhibitionsPage
+                exhibitions={exhibitions}
+                isLoading={publicExhibitionsLoading}
+                onStallClick={handleStallClick}
+                onCreateBookingRequest={handleCreateBookingRequest}
+                {...commonProps}
+              />
+            }
+          />
+          <Route
+            path="/networking"
+            element={
+              <NetworkingPage
+                stalls={publicStalls}
+                onStallClick={handleStallClick}
+                {...commonProps}
+              />
+            }
+          />
+          <Route path="/pricing" element={<PricingPage {...commonProps} />} />
+          <Route path="/help" element={<HelpCenterPage {...commonProps} />} />
+          <Route path="/about" element={<AboutPage {...commonProps} />} />
+          <Route path="/blog" element={<BlogPage {...commonProps} />} />
+          <Route path="/jobs" element={<JobsPage {...commonProps} />} />
+          <Route path="/claim" element={<LegalPage pageType="claim" {...commonProps} />} />
+          <Route path="/privacy" element={<LegalPage pageType="privacy" {...commonProps} />} />
+          <Route path="/terms" element={<LegalPage pageType="terms" {...commonProps} />} />
+          <Route
+            path="/open-a-stall"
+            element={<CreateStallPage onCreateStall={handleCreateStall} {...commonProps} />}
+          />
+          <Route
+            path="/search"
+            element={
+              <SearchRoute
+                allStalls={publicStalls}
+                onStallClick={handleStallClick}
+                onNavigate={handleNavigate}
+                onSearch={handleSearch}
+                currentUser={currentUser}
+                onLogout={handleLogout}
+              />
+            }
+          />
+          <Route
+            path="/stall/:stallId"
+            element={
+              <StallRoute
+                stalls={allStalls}
+                onProposePartnership={handleProposePartnership}
+                onCreateQuoteRequest={handleCreateQuoteRequest}
+                onNavigate={handleNavigate}
+                onSearch={handleSearch}
+                onLogout={handleLogout}
+                currentUser={currentUser}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <LoginPage
+                onLogin={handleLogin}
+                onSignUp={handleSignUp}
+                onNavigate={handleNavigate}
+              />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              !currentUser || !myStall ? (
+                <Navigate to="/" replace />
+              ) : (
+                <StallholderDashboardPage
+                  stall={myStall}
+                  partnershipRequests={partnershipRequests}
+                  quoteRequests={quoteRequests}
+                  onNavigate={handleNavigate}
+                  currentUser={currentUser}
+                  onLogout={handleLogout}
+                  onSearch={handleSearch}
+                  onUpdateStall={handleUpdateStall}
+                  onAddProduct={handleAddProduct}
+                  onUpdateProduct={handleUpdateProduct}
+                  onDeleteProduct={handleDeleteProduct}
+                  onAddPromotion={handleAddPromotion}
+                  onUpdatePromotion={handleUpdatePromotion}
+                  onDeletePromotion={handleDeletePromotion}
+                  onAddGalleryItem={handleAddGalleryItem}
+                  onDeleteGalleryItem={handleDeleteGalleryItem}
+                  onUpdatePartnershipStatus={handleUpdatePartnershipStatus}
+                  onUpdateQuoteRequestStatus={handleUpdateQuoteRequestStatus}
+                />
+              )
+            }
+          />
+          <Route
+            path="/admin/mfa"
+            element={
+              currentUser?.role !== 'admin' ? (
+                <Navigate to="/login" replace />
+              ) : mfaVerified ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <AdminMfaPage
+                  currentUser={currentUser}
+                  onLogout={handleLogout}
+                  onVerified={handleMfaVerified}
+                  onNavigate={handleNavigate}
+                />
+              )
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              currentUser?.role !== 'admin' ? (
+                <Navigate to="/login" replace />
+              ) : !mfaVerified ? (
+                <Navigate to="/admin/mfa" replace />
+              ) : (
+                <AdminDashboardPage
+                  stalls={adminStalls}
+                  users={users}
+                  exhibitions={adminExhibitions}
+                  bookingRequests={bookingRequests}
+                  onCreateExhibition={handleCreateExhibition}
+                  onUpdateExhibition={handleUpdateExhibition}
+                  onDeleteExhibition={handleDeleteExhibition}
+                  onAssignStallToExhibition={handleAssignStallToExhibition}
+                  onRemoveStallFromExhibition={handleRemoveStallFromExhibition}
+                  onUpdateBookingRequestStatus={handleUpdateBookingRequestStatus}
+                  onUpdateStallStatus={handleUpdateStallStatus}
+                  onNavigate={handleNavigate}
+                  currentUser={currentUser}
+                  onLogout={handleLogout}
+                  onSearch={handleSearch}
+                />
+              )
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
+  );
+}
