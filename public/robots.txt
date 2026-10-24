@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Do not index account or dashboard surfaces.
+Disallow: /login
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /search
+
+Sitemap: https://exhistall.netlify.app/sitemap.xml

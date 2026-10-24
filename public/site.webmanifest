@@ -2,23 +2,31 @@
   "name": "Exhistall — The digital marketplace",
   "short_name": "Exhistall",
   "description": "Discover independent businesses, products, services and exhibition halls.",
+  "id": "https://exhistall.netlify.app/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#F4F7FC",
   "theme_color": "#071D49",
+  "categories": ["shopping", "business"],
   "icons": [
     {
-      "src": "/brand/exhistall-icon.svg",
+      "src": "/brand/exhistall-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/exhistall-apple-touch-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/brand/exhistall-apple-touch-icon.svg",
+      "src": "/brand/apple-touch-icon.png",
       "sizes": "180x180",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
