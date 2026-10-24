@@ -1,6 +1,5 @@
 import React from 'react';
 import type { PartnershipRequest } from '../types';
-import { Icon } from './Icon';
 
 interface PartnershipRequestCardProps {
     request: PartnershipRequest;

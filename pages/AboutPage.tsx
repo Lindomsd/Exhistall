@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Icon } from '../components/Icon';
 import { mockTeamMembers } from '../data/mockData';
 import type { TeamMember, User } from '../types';
 

@@ -1,1 +1,443 @@
-import{Fragment as f,jsx as e,jsxs as a}from"react/jsx-runtime";import{useState as k,useRef as L,useEffect as _,useMemo as z}from"react";import H from"../components/Header";import V from"../components/Footer";import{Icon as m}from"../components/Icon";import j from"../components/ExhibitionManager";import J from"../components/ExhibitionBookingRequestInbox";const p=({title:o,value:s,icon:l})=>e("div",{className:"bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg",children:a("div",{className:"flex items-center",children:[e("div",{className:"bg-brand-blue/10 dark:bg-brand-gold/10 p-3 rounded-full",children:e(m,{name:l,className:"h-6 w-6 text-brand-blue dark:text-brand-gold"})}),a("div",{className:"ml-4",children:[e("p",{className:"text-sm font-medium text-brand-secondary dark:text-slate-400",children:o}),e("p",{className:"text-2xl font-bold text-brand-dark dark:text-white",children:s})]})]})}),G=({stalls:o,users:s,onNavigate:l,currentUser:w,onLogout:S,onUpdateStallStatus:E,exhibitions:A,onCreateExhibition:C,onUpdateExhibition:U,onDeleteExhibition:P,onAssignStallToExhibition:R,onRemoveStallFromExhibition:I,bookingRequests:u,onUpdateBookingRequestStatus:$,onSearch:B})=>{const[n,b]=k("stalls"),[N,x]=k(null),[g,M]=k("all"),h=L(null);_(()=>{const t=r=>{h.current&&!h.current.contains(r.target)&&x(null)};return document.addEventListener("mousedown",t),()=>{document.removeEventListener("mousedown",t)}},[]);const y=z(()=>o.filter(t=>g==="all"||t.status===g),[o,g]),c={totalStalls:o.length,pendingStalls:o.filter(t=>t.status==="pending_review").length,totalUsers:s.length,totalAdmins:s.filter(t=>t.role==="admin").length},T=t=>{switch(t){case"active":return"bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";case"suspended":return"bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";case"banned":return"bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";case"pending_review":return"bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";default:return"bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}},q=t=>t==="admin"?"bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300":"bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",i=(t,r)=>{const d=o.find(O=>O.id===t)?.name||"this stall";let v=`Are you sure you want to change status to ${r} for ${d}?`;r==="active"&&(v=`Are you sure you want to APPROVE ${d}?`),r==="banned"&&(v=`Are you sure you want to REJECT and BAN ${d}? This is irreversible.`),window.confirm(v)&&E(t,r),x(null)},F=()=>a("div",{className:"bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg",children:[a("div",{className:"flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4",children:[a("h2",{className:"text-xl font-bold whitespace-nowrap",children:["Stalls Management (",y.length," found)"]}),a("div",{children:[e("label",{htmlFor:"status-filter",className:"sr-only",children:"Filter by Status"}),a("select",{id:"status-filter",value:g,onChange:t=>M(t.target.value),className:"p-2 border border-gray-300 dark:border-slate-600 rounded-md bg-brand-light dark:bg-brand-dark focus:ring-2 focus:ring-brand-blue dark:focus:ring-brand-gold outline-none transition w-full",children:[e("option",{value:"all",children:"All Statuses"}),e("option",{value:"pending_review",children:"Pending Review"}),e("option",{value:"active",children:"Active"}),e("option",{value:"suspended",children:"Suspended"}),e("option",{value:"banned",children:"Banned"})]})]})]}),a("div",{className:"overflow-x-auto",children:[a("table",{className:"w-full text-sm text-left text-gray-500 dark:text-gray-400",children:[e("thead",{className:"text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400",children:a("tr",{children:[e("th",{scope:"col",className:"px-6 py-3",children:"Stall Name"}),e("th",{scope:"col",className:"px-6 py-3",children:"Owner"}),e("th",{scope:"col",className:"px-6 py-3",children:"Category"}),e("th",{scope:"col",className:"px-6 py-3",children:"Status"}),e("th",{scope:"col",className:"px-6 py-3",children:"Actions"})]})}),e("tbody",{children:y.map(t=>{const r=s.find(d=>d.id===t.ownerId);return a("tr",{className:"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600",children:[e("th",{scope:"row",className:"px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white",children:t.name}),e("td",{className:"px-6 py-4",children:r?.name||"Unknown"}),e("td",{className:"px-6 py-4",children:t.category}),e("td",{className:"px-6 py-4",children:e("span",{className:`px-2 py-1 rounded-full text-xs font-semibold capitalize ${T(t.status)}`,children:t.status.replace("_"," ")})}),e("td",{className:"px-6 py-4 text-right",children:a("div",{className:"relative",children:[e("button",{onClick:()=>x(N===t.id?null:t.id),className:"font-medium text-brand-blue dark:text-brand-gold hover:underline",children:"Actions"}),N===t.id&&e("div",{ref:h,className:"absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-md shadow-lg z-10 border dark:border-slate-700",children:a("div",{className:"py-1",children:[a("button",{onClick:()=>l("stall",t.id),className:"flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800",children:[e(m,{name:"eye",className:"h-4 w-4"})," View Stall"]}),t.status==="pending_review"&&a(f,{children:[a("button",{onClick:()=>i(t.id,"active"),className:"flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-slate-800",children:[e(m,{name:"check-circle",className:"h-4 w-4"})," Approve"]}),a("button",{onClick:()=>i(t.id,"banned"),className:"flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-slate-800",children:[e(m,{name:"x",className:"h-4 w-4"})," Reject"]})]}),t.status==="active"&&a(f,{children:[e("button",{onClick:()=>i(t.id,"suspended"),className:"flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-yellow-600 dark:text-yellow-400 hover:bg-gray-100 dark:hover:bg-slate-800",children:"Suspend"}),e("button",{onClick:()=>i(t.id,"banned"),className:"flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-slate-800",children:"Ban"})]}),t.status==="suspended"&&e("button",{onClick:()=>i(t.id,"active"),className:"flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-slate-800",children:"Reactivate"})]})})]})})]},t.id)})})]}),y.length===0&&e("div",{className:"text-center py-8 text-brand-secondary dark:text-slate-400",children:"No stalls match the current filters."})]})]}),D=()=>a("div",{className:"bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg",children:[a("h2",{className:"text-xl font-bold mb-4",children:["Users Management (",s.length," total)"]}),e("div",{className:"overflow-x-auto",children:a("table",{className:"w-full text-sm text-left text-gray-500 dark:text-gray-400",children:[e("thead",{className:"text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400",children:a("tr",{children:[e("th",{scope:"col",className:"px-6 py-3",children:"User Name"}),e("th",{scope:"col",className:"px-6 py-3",children:"Email"}),e("th",{scope:"col",className:"px-6 py-3",children:"Role"}),e("th",{scope:"col",className:"px-6 py-3",children:"Stall Owned"})]})}),e("tbody",{children:s.map(t=>{const r=o.find(d=>d.id===t.stallId);return a("tr",{className:"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600",children:[e("th",{scope:"row",className:"px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white",children:t.name}),e("td",{className:"px-6 py-4",children:t.email}),e("td",{className:"px-6 py-4",children:e("span",{className:`px-2 py-1 rounded-full text-xs font-semibold capitalize ${q(t.role)}`,children:t.role})}),e("td",{className:"px-6 py-4",children:r?.name||"N/A"})]},t.id)})})]})})]});return a(f,{children:[e(H,{onNavigate:l,currentUser:w,onLogout:S,onSearch:B}),e("main",{className:"bg-brand-light dark:bg-brand-dark",children:a("div",{className:"container mx-auto px-4 sm:px-6 lg:px-8 py-12",children:[e("h1",{className:"text-3xl font-extrabold mb-8",children:"Admin Dashboard"}),a("div",{className:"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8",children:[e(p,{title:"Total Stalls",value:c.totalStalls.toString(),icon:"store"}),e(p,{title:"Pending Approval",value:c.pendingStalls.toString(),icon:"package"}),e(p,{title:"Total Users",value:c.totalUsers.toString(),icon:"users"}),e(p,{title:"Admins",value:c.totalAdmins.toString(),icon:"user-circle"})]}),e("div",{className:"mb-8 border-b border-gray-300 dark:border-slate-700",children:a("nav",{className:"-mb-px flex space-x-8","aria-label":"Tabs",children:[e("button",{onClick:()=>b("stalls"),className:`${n==="stalls"?"border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold":"border-transparent text-brand-secondary hover:border-gray-400"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`,children:"Stalls"}),e("button",{onClick:()=>b("exhibitions"),className:`${n==="exhibitions"?"border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold":"border-transparent text-brand-secondary hover:border-gray-400"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`,children:"Exhibition halls"}),a("button",{onClick:()=>b("booking-requests"),className:`${n==="booking-requests"?"border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold":"border-transparent text-brand-secondary hover:border-gray-400"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`,children:["Booking requests",u.filter(t=>t.status==="pending").length?` (${u.filter(t=>t.status==="pending").length})`:""]}),e("button",{onClick:()=>b("users"),className:`${n==="users"?"border-brand-blue dark:border-brand-gold text-brand-blue dark:text-brand-gold":"border-transparent text-brand-secondary hover:border-gray-400"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`,children:"Users"})]})}),n==="stalls"?e(F,{}):n==="exhibitions"?e(j,{exhibitions:A,stalls:o,onCreate:C,onUpdate:U,onDelete:P,onAssign:R,onRemove:I,onOpenStall:t=>l("stall",t.id)}):n==="booking-requests"?e(J,{requests:u,onUpdateStatus:$}):e(D,{})]})}),e(V,{onNavigate:l})]})};var te=G;export{te as default};
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { Icon } from '../components/Icon';
+import ExhibitionManager from '../components/ExhibitionManager';
+import ExhibitionBookingRequestInbox from '../components/ExhibitionBookingRequestInbox';
+import type {
+  Exhibition,
+  ExhibitionBookingRequest,
+  ExhibitionBookingStatus,
+  ExhibitionInput,
+  Stall,
+  User,
+} from '../types';
+
+interface AdminDashboardPageProps {
+  stalls: Stall[];
+  users: User[];
+  onNavigate: (page: string, stallId?: string) => void;
+  currentUser: User | null;
+  onLogout: () => void;
+  onUpdateStallStatus: (stallId: string, status: Stall['status']) => Promise<void> | void;
+  exhibitions: Exhibition[];
+  onCreateExhibition: (input: ExhibitionInput) => Promise<void>;
+  onUpdateExhibition: (id: string, input: Partial<ExhibitionInput>) => Promise<void>;
+  onDeleteExhibition: (id: string) => Promise<void>;
+  onAssignStallToExhibition: (
+    exhibitionId: string,
+    stallId: string,
+    boothLabel: string,
+    sortOrder: number,
+  ) => Promise<void>;
+  onRemoveStallFromExhibition: (exhibitionId: string, stallId: string) => Promise<void>;
+  bookingRequests: ExhibitionBookingRequest[];
+  onUpdateBookingRequestStatus: (id: string, status: ExhibitionBookingStatus) => Promise<void>;
+  onSearch: (query: string) => void;
+}
+
+type TabKey = 'stalls' | 'exhibitions' | 'booking-requests' | 'users';
+type StatusFilter = 'all' | Stall['status'];
+
+const STATUSES: StatusFilter[] = ['all', 'pending_review', 'active', 'suspended', 'banned'];
+
+function StatCard({ title, value, icon }: { title: string; value: string; icon: string }) {
+  return (
+    <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+      <div className="flex items-center">
+        <div className="rounded-full bg-brand-blue/10 p-3 dark:bg-brand-gold/10">
+          <Icon name={icon} className="h-6 w-6 text-brand-blue dark:text-brand-gold" />
+        </div>
+        <div className="ml-4">
+          <p className="text-sm font-medium text-brand-secondary dark:text-slate-400">{title}</p>
+          <p className="text-2xl font-bold text-brand-dark dark:text-white">{value}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function stallStatusClass(status: Stall['status']): string {
+  switch (status) {
+    case 'active':
+      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+    case 'suspended':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+    case 'banned':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+    case 'pending_review':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+  }
+}
+
+function roleClass(role: User['role']): string {
+  return role === 'admin'
+    ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300'
+    : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+}
+
+export default function AdminDashboardPage({
+  stalls,
+  users,
+  onNavigate,
+  currentUser,
+  onLogout,
+  onUpdateStallStatus,
+  exhibitions,
+  onCreateExhibition,
+  onUpdateExhibition,
+  onDeleteExhibition,
+  onAssignStallToExhibition,
+  onRemoveStallFromExhibition,
+  bookingRequests,
+  onUpdateBookingRequestStatus,
+  onSearch,
+}: AdminDashboardPageProps) {
+  const [activeTab, setActiveTab] = useState<TabKey>('stalls');
+  const [openActionsStallId, setOpenActionsStallId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const actionsMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(event.target as Node)) {
+        setOpenActionsStallId(null);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, []);
+
+  const filteredStalls = useMemo(
+    () => stalls.filter((stall) => statusFilter === 'all' || stall.status === statusFilter),
+    [stalls, statusFilter],
+  );
+
+  const stats = {
+    totalStalls: stalls.length,
+    pendingStalls: stalls.filter((stall) => stall.status === 'pending_review').length,
+    totalUsers: users.length,
+    totalAdmins: users.filter((user) => user.role === 'admin').length,
+  };
+
+  const pendingBookings = bookingRequests.filter((request) => request.status === 'pending').length;
+
+  const changeStallStatus = (stallId: string, nextStatus: Stall['status']) => {
+    const name = stalls.find((stall) => stall.id === stallId)?.name || 'this stall';
+    let message = `Are you sure you want to change status to ${nextStatus} for ${name}?`;
+    if (nextStatus === 'active') message = `Are you sure you want to APPROVE ${name}?`;
+    if (nextStatus === 'banned')
+      message = `Are you sure you want to REJECT and BAN ${name}? This is irreversible.`;
+    if (window.confirm(message)) onUpdateStallStatus(stallId, nextStatus);
+    setOpenActionsStallId(null);
+  };
+
+  const tabButtonClass = (tab: TabKey) =>
+    `${
+      activeTab === tab
+        ? 'border-brand-blue text-brand-blue dark:border-brand-gold dark:text-brand-gold'
+        : 'border-transparent text-brand-secondary hover:border-gray-400'
+    } whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium`;
+
+  const renderStallsTab = () => (
+    <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+      <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <h2 className="text-xl font-bold whitespace-nowrap">
+          Stalls Management ({filteredStalls.length} found)
+        </h2>
+        <div>
+          <label htmlFor="status-filter" className="sr-only">
+            Filter by Status
+          </label>
+          <select
+            id="status-filter"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+            className="w-full rounded-md border border-gray-300 bg-brand-light p-2 outline-none transition focus:ring-2 focus:ring-brand-blue dark:border-slate-600 dark:bg-brand-dark dark:focus:ring-brand-gold"
+          >
+            {STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {status === 'all' ? 'All Statuses' : status.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+          <thead className="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Stall Name
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Owner
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Category
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredStalls.map((stall) => {
+              const owner = users.find((user) => user.id === stall.ownerId);
+              return (
+                <tr
+                  key={stall.id}
+                  className="border-b bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white"
+                  >
+                    {stall.name}
+                  </th>
+                  <td className="px-6 py-4">{owner?.name || 'Unknown'}</td>
+                  <td className="px-6 py-4">{stall.category}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${stallStatusClass(stall.status)}`}
+                    >
+                      {stall.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="relative">
+                      <button
+                        onClick={() =>
+                          setOpenActionsStallId(openActionsStallId === stall.id ? null : stall.id)
+                        }
+                        className="font-medium text-brand-blue hover:underline dark:text-brand-gold"
+                      >
+                        Actions
+                      </button>
+                      {openActionsStallId === stall.id && (
+                        <div
+                          ref={actionsMenuRef}
+                          className="absolute right-0 z-10 mt-2 w-48 rounded-md border bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                        >
+                          <div className="py-1">
+                            <MenuItem icon="eye" onClick={() => onNavigate('stall', stall.id)}>
+                              View Stall
+                            </MenuItem>
+                            {stall.status === 'pending_review' && (
+                              <Fragment>
+                                <MenuItem
+                                  icon="check-circle"
+                                  tone="green"
+                                  onClick={() => changeStallStatus(stall.id, 'active')}
+                                >
+                                  Approve
+                                </MenuItem>
+                                <MenuItem
+                                  icon="x"
+                                  tone="red"
+                                  onClick={() => changeStallStatus(stall.id, 'banned')}
+                                >
+                                  Reject
+                                </MenuItem>
+                              </Fragment>
+                            )}
+                            {stall.status === 'active' && (
+                              <Fragment>
+                                <MenuItem
+                                  tone="yellow"
+                                  onClick={() => changeStallStatus(stall.id, 'suspended')}
+                                >
+                                  Suspend
+                                </MenuItem>
+                                <MenuItem
+                                  tone="red"
+                                  onClick={() => changeStallStatus(stall.id, 'banned')}
+                                >
+                                  Ban
+                                </MenuItem>
+                              </Fragment>
+                            )}
+                            {stall.status === 'suspended' && (
+                              <MenuItem
+                                tone="green"
+                                onClick={() => changeStallStatus(stall.id, 'active')}
+                              >
+                                Reactivate
+                              </MenuItem>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {filteredStalls.length === 0 && (
+          <div className="py-8 text-center text-brand-secondary dark:text-slate-400">
+            No stalls match the current filters.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderUsersTab = () => (
+    <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+      <h2 className="mb-4 text-xl font-bold">Users Management ({users.length} total)</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+          <thead className="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                User Name
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Email
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Role
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Stall Owned
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => {
+              const ownedStall = stalls.find((stall) => stall.id === user.stallId);
+              return (
+                <tr
+                  key={user.id}
+                  className="border-b bg-white dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium whitespace-nowrap text-gray-900 dark:text-white"
+                  >
+                    {user.name}
+                  </th>
+                  <td className="px-6 py-4">{user.email}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${roleClass(user.role)}`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">{ownedStall?.name || 'N/A'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  return (
+    <Fragment>
+      <Header
+        onNavigate={onNavigate}
+        currentUser={currentUser}
+        onLogout={onLogout}
+        onSearch={onSearch}
+      />
+      <main className="bg-brand-light dark:bg-brand-dark">
+        <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8">
+          <h1 className="mb-8 text-3xl font-extrabold">Admin Dashboard</h1>
+
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard title="Total Stalls" value={String(stats.totalStalls)} icon="store" />
+            <StatCard title="Pending Approval" value={String(stats.pendingStalls)} icon="package" />
+            <StatCard title="Total Users" value={String(stats.totalUsers)} icon="users" />
+            <StatCard title="Admins" value={String(stats.totalAdmins)} icon="user-circle" />
+          </div>
+
+          <div className="mb-8 border-b border-gray-300 dark:border-slate-700">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              <button onClick={() => setActiveTab('stalls')} className={tabButtonClass('stalls')}>
+                Stalls
+              </button>
+              <button
+                onClick={() => setActiveTab('exhibitions')}
+                className={tabButtonClass('exhibitions')}
+              >
+                Exhibition halls
+              </button>
+              <button
+                onClick={() => setActiveTab('booking-requests')}
+                className={tabButtonClass('booking-requests')}
+              >
+                Booking requests{pendingBookings ? ` (${pendingBookings})` : ''}
+              </button>
+              <button onClick={() => setActiveTab('users')} className={tabButtonClass('users')}>
+                Users
+              </button>
+            </nav>
+          </div>
+
+          {activeTab === 'stalls' && renderStallsTab()}
+          {activeTab === 'exhibitions' && (
+            <ExhibitionManager
+              exhibitions={exhibitions}
+              stalls={stalls}
+              onCreate={onCreateExhibition}
+              onUpdate={onUpdateExhibition}
+              onDelete={onDeleteExhibition}
+              onAssign={onAssignStallToExhibition}
+              onRemove={onRemoveStallFromExhibition}
+              onOpenStall={(stall) => onNavigate('stall', stall.id)}
+            />
+          )}
+          {activeTab === 'booking-requests' && (
+            <ExhibitionBookingRequestInbox
+              requests={bookingRequests}
+              onUpdateStatus={onUpdateBookingRequestStatus}
+            />
+          )}
+          {activeTab === 'users' && renderUsersTab()}
+        </div>
+      </main>
+      <Footer onNavigate={onNavigate} />
+    </Fragment>
+  );
+}
+
+function MenuItem({
+  children,
+  icon,
+  tone = 'default',
+  onClick,
+}: {
+  children: React.ReactNode;
+  icon?: string;
+  tone?: 'default' | 'green' | 'red' | 'yellow';
+  onClick: () => void;
+}) {
+  const toneClass =
+    tone === 'green'
+      ? 'text-green-600 dark:text-green-400'
+      : tone === 'red'
+        ? 'text-red-600 dark:text-red-400'
+        : tone === 'yellow'
+          ? 'text-yellow-600 dark:text-yellow-400'
+          : 'text-gray-700 dark:text-slate-300';
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-slate-800 ${toneClass}`}
+    >
+      {icon && <Icon name={icon} className="h-4 w-4" />}
+      {children}
+    </button>
+  );
+}

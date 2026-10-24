@@ -10,7 +10,7 @@ interface PartnershipModalProps {
   onSubmit: (message: string) => void;
 }
 
-const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, proposerStallId, recipientStall, onSubmit }) => {
+const PartnershipModal: React.FC<PartnershipModalProps> = ({ isOpen, onClose, recipientStall, onSubmit }) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
