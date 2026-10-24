@@ -10,6 +10,10 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { api } from './services/api';
+import { isSupabaseConfigured } from './supabaseClient';
+import Spinner from './components/Spinner';
+import SetupNotice from './components/SetupNotice';
+import NotFoundPage from './pages/NotFoundPage';
 import type {
   Exhibition,
   ExhibitionBookingRequest,
@@ -94,8 +98,8 @@ function hrefFor(page: string, stallId?: string): string {
 
 function RouteFallback() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="text-lg font-semibold opacity-70">Loading…</p>
+    <div className="flex min-h-screen items-center justify-center bg-brand-light text-brand-dark">
+      <Spinner label="Loading page…" />
     </div>
   );
 }
@@ -239,6 +243,10 @@ function AppShell() {
   }, []);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setAppLoading(false);
+      return;
+    }
     let active = true;
     (async () => {
       setAppLoading(true);
@@ -602,9 +610,13 @@ function AppShell() {
   if (appLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-brand-light text-brand-dark">
-        <p className="text-xl font-semibold">Loading Exhistall…</p>
+        <Spinner label="Loading Exhistall…" />
       </div>
     );
+  }
+
+  if (!isSupabaseConfigured) {
+    return <SetupNotice />;
   }
 
   const commonProps = {
@@ -781,7 +793,7 @@ function AppShell() {
               )
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </div>
