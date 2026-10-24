@@ -1,1 +1,824 @@
-import{requireSupabase as n}from"../supabaseClient";const d="*, products(*), promotions(*), gallery_items(*), reviews(*)",S=t=>({id:t.id,name:t.name,description:t.description,price:Number(t.price),imageUrl:t.image_url,listingType:t.listing_type??"product",category:t.category??"",priceNote:t.price_note??"",compareAtPrice:t.compare_at_price==null?void 0:Number(t.compare_at_price),isAvailable:t.is_available??!0,featured:t.featured??!1,sortOrder:t.sort_order??0}),x=t=>({id:t.id,title:t.title,description:t.description,imageUrl:t.image_url,promotionLabel:t.promotion_label,startAt:t.start_at??void 0,endAt:t.end_at??void 0,isActive:t.is_active,sortOrder:t.sort_order??0}),u=t=>({id:t.id,ownerId:t.owner_id,name:t.name,slogan:t.slogan,category:t.category,logo_url:t.logo_url,banner_url:t.banner_url,description:t.description,mission:t.mission,products:(t.products??[]).map(S).sort((e,i)=>Number(i.featured)-Number(e.featured)||e.sortOrder-i.sortOrder),promotions:(t.promotions??[]).map(x).sort((e,i)=>e.sortOrder-i.sortOrder),gallery:(t.gallery_items??[]).map(e=>({id:e.id,type:e.type,url:e.url,thumbnailUrl:e.thumbnail_url??void 0,caption:e.caption??"",sortOrder:e.sort_order??0})).sort((e,i)=>e.sortOrder-i.sortOrder),reviews:(t.reviews??[]).map(e=>({id:e.id,author:e.author,rating:e.rating,comment:e.comment,date:e.created_at})),location:{address:t.address,lat:t.latitude??0,lng:t.longitude??0},contact:{phone:t.phone,email:t.email,website:t.website,whatsapp:t.whatsapp??"",instagram:t.instagram??"",facebook:t.facebook??""},tradingHours:t.trading_hours??"",featured:t.featured,status:t.status}),g=async t=>{if(!t)return null;const e=n(),{data:i,error:r}=await e.from("profiles").select("id, name, email, role").eq("id",t.id).maybeSingle();if(r)throw r;const{data:a,error:o}=await e.from("stalls").select("id").eq("owner_id",t.id).maybeSingle();if(o)throw o;return{id:t.id,email:i?.email??t.email,name:i?.name??t.email?.split("@")[0]??"Member",role:i?.role??"user",stallId:a?.id}},s=async t=>{const{data:e,error:i}=await n().from("stalls").select(d).eq("id",t).maybeSingle();if(i)throw i;return e?u(e):null},p=async t=>{const[e,i]=await Promise.all([s(t.proposer_stall_id),s(t.recipient_stall_id)]);return{id:t.id,proposerStallId:t.proposer_stall_id,recipientStallId:t.recipient_stall_id,proposerStall:e??void 0,recipientStall:i??void 0,message:t.message,status:t.status,date:t.created_at}},b=t=>({id:t.id,stallId:t.stall_id,productId:t.product_id??void 0,productName:t.products?.name,requesterName:t.requester_name,requesterPhone:t.requester_phone??"",requesterEmail:t.requester_email??"",preferredContact:t.preferred_contact,message:t.message,budgetNote:t.budget_note??"",status:t.status,createdAt:t.created_at}),f=t=>({id:t.id,exhibitionId:t.exhibition_id,exhibitionTitle:t.exhibitions?.title,stallId:t.stall_id??void 0,stallName:t.stalls?.name,businessName:t.business_name,contactName:t.contact_name,email:t.email,phone:t.phone,requestedPackage:t.requested_package,message:t.message,status:t.status,createdAt:t.created_at}),c=`*, exhibition_stalls(booth_label, sort_order, stalls(${d}))`,m=t=>({id:t.id,title:t.title,description:t.description??"",heroImageUrl:t.hero_image_url??"",location:t.location??"",startsAt:t.starts_at??void 0,endsAt:t.ends_at??void 0,status:t.status,sortOrder:t.sort_order??0,stalls:(t.exhibition_stalls??[]).filter(e=>e.stalls).map(e=>({stall:u(e.stalls),boothLabel:e.booth_label||void 0,sortOrder:e.sort_order??0})).sort((e,i)=>e.sortOrder-i.sortOrder)}),h=t=>({...t.title!==void 0&&{title:t.title.trim()},...t.description!==void 0&&{description:t.description.trim()},...t.heroImageUrl!==void 0&&{hero_image_url:t.heroImageUrl.trim()},...t.location!==void 0&&{location:t.location.trim()},...t.startsAt!==void 0&&{starts_at:t.startsAt||null},...t.endsAt!==void 0&&{ends_at:t.endsAt||null},...t.status!==void 0&&{status:t.status},...t.sortOrder!==void 0&&{sort_order:t.sortOrder}}),E=t=>({requester_name:t.requesterName.trim(),requester_phone:t.requesterPhone.trim(),requester_email:t.requesterEmail.trim(),preferred_contact:t.preferredContact,...t.productId&&{product_id:t.productId},message:t.message.trim(),budget_note:t.budgetNote.trim()}),y=t=>({...t.name!==void 0&&{name:t.name.trim()},...t.slogan!==void 0&&{slogan:t.slogan.trim()},...t.category!==void 0&&{category:t.category},...t.logo_url!==void 0&&{logo_url:t.logo_url.trim()},...t.banner_url!==void 0&&{banner_url:t.banner_url.trim()},...t.description!==void 0&&{description:t.description.trim()},...t.mission!==void 0&&{mission:t.mission.trim()},...t.location?.address!==void 0&&{address:t.location.address.trim()},...t.location?.lat!==void 0&&{latitude:t.location.lat},...t.location?.lng!==void 0&&{longitude:t.location.lng},...t.contact?.phone!==void 0&&{phone:t.contact.phone.trim()},...t.contact?.email!==void 0&&{email:t.contact.email.trim()},...t.contact?.website!==void 0&&{website:t.contact.website.trim()},...t.contact?.whatsapp!==void 0&&{whatsapp:t.contact.whatsapp.trim()},...t.contact?.instagram!==void 0&&{instagram:t.contact.instagram.trim()},...t.contact?.facebook!==void 0&&{facebook:t.contact.facebook.trim()},...t.tradingHours!==void 0&&{trading_hours:t.tradingHours.trim()}}),q=t=>({...t.name!==void 0&&{name:t.name.trim()},...t.description!==void 0&&{description:t.description.trim()},...t.price!==void 0&&{price:t.price},...t.imageUrl!==void 0&&{image_url:t.imageUrl.trim()},...t.listingType!==void 0&&{listing_type:t.listingType},...t.category!==void 0&&{category:t.category.trim()},...t.priceNote!==void 0&&{price_note:t.priceNote.trim()},...Object.prototype.hasOwnProperty.call(t,"compareAtPrice")&&{compare_at_price:t.compareAtPrice??null},...t.isAvailable!==void 0&&{is_available:t.isAvailable},...t.featured!==void 0&&{featured:t.featured},...t.sortOrder!==void 0&&{sort_order:t.sortOrder}}),P=t=>({...t.title!==void 0&&{title:t.title.trim()},...t.description!==void 0&&{description:t.description.trim()},...t.imageUrl!==void 0&&{image_url:t.imageUrl.trim()},...t.promotionLabel!==void 0&&{promotion_label:t.promotionLabel.trim()},...t.startAt!==void 0&&{start_at:t.startAt||null},...t.endAt!==void 0&&{end_at:t.endAt||null},...t.isActive!==void 0&&{is_active:t.isActive},...t.sortOrder!==void 0&&{sort_order:t.sortOrder}}),D={async getAdminMfaState(){const t=n(),[{data:e,error:i},{data:r,error:a}]=await Promise.all([t.auth.mfa.getAuthenticatorAssuranceLevel(),t.auth.mfa.listFactors()]);if(i)throw i;if(a)throw a;const o=r.totp[0],l=r.all.find(_=>_.factor_type==="totp"&&_.status==="unverified");return{enrolled:!!o,verified:e.currentLevel==="aal2",factorId:o?.id,pendingFactorId:l?.id}},async enrolAdminMfa(){if((await this.getAdminMfaState()).pendingFactorId)throw new Error("Two-factor setup is already waiting for verification. Enter a code from the authenticator entry you scanned to finish setup.");const{data:e,error:i}=await n().auth.mfa.enroll({factorType:"totp",friendlyName:"Exhistall administrator"});if(i)throw i;return{factorId:e.id,qrCode:e.totp.qr_code}},async verifyAdminMfa(t,e){const i=n(),{data:r,error:a}=await i.auth.mfa.challenge({factorId:t});if(a)throw a;const{error:o}=await i.auth.mfa.verify({factorId:t,challengeId:r.id,code:e});if(o)throw o},async getStalls(){const{data:t,error:e}=await n().from("stalls").select(d).eq("status","active").order("featured",{ascending:!1}).order("created_at",{ascending:!1});if(e)throw e;return(t??[]).map(u)},async getAllStallsForAdmin(){const{data:t,error:e}=await n().from("stalls").select(d).order("created_at",{ascending:!1});if(e)throw e;return(t??[]).map(u)},async getExhibitions(){const{data:t,error:e}=await n().from("exhibitions").select(c).eq("status","published").order("starts_at",{ascending:!0,nullsFirst:!1}).order("sort_order");if(e)throw e;return(t??[]).map(m).filter(i=>!i.endsAt||new Date(i.endsAt)>=new Date)},async getAllExhibitionsForAdmin(){const{data:t,error:e}=await n().from("exhibitions").select(c).order("created_at",{ascending:!1});if(e)throw e;return(t??[]).map(m)},async createExhibition(t){const{data:e,error:i}=await n().from("exhibitions").insert(h(t)).select(c).single();if(i)throw i;return m(e)},async updateExhibition(t,e){const{data:i,error:r}=await n().from("exhibitions").update(h(e)).eq("id",t).select(c).maybeSingle();if(r)throw r;return i?m(i):null},async deleteExhibition(t){const{error:e}=await n().from("exhibitions").delete().eq("id",t);if(e)throw e},async assignStallToExhibition(t,e,i="",r=0){const{error:a}=await n().from("exhibition_stalls").insert({exhibition_id:t,stall_id:e,booth_label:i.trim(),sort_order:r});if(a)throw a},async removeStallFromExhibition(t,e){const{error:i}=await n().from("exhibition_stalls").delete().eq("exhibition_id",t).eq("stall_id",e);if(i)throw i},async createExhibitionBookingRequest(t,e){const i=await this.getCurrentUser();if(!i)throw new Error("Please sign in before requesting an exhibition stall.");const{data:r,error:a}=await n().from("exhibition_booking_requests").insert({exhibition_id:t,requester_id:i.id,...i.stallId&&{stall_id:i.stallId},business_name:e.businessName.trim(),contact_name:e.contactName.trim(),email:e.email.trim(),phone:e.phone.trim(),requested_package:e.requestedPackage,message:e.message.trim()}).select("*, exhibitions(title), stalls(name)").single();if(a)throw a;return f(r)},async getExhibitionBookingRequestsForAdmin(){const{data:t,error:e}=await n().from("exhibition_booking_requests").select("*, exhibitions(title), stalls(name)").order("created_at",{ascending:!1});if(e)throw e;return(t??[]).map(f)},async updateExhibitionBookingRequestStatus(t,e){const{data:i,error:r}=await n().from("exhibition_booking_requests").update({status:e}).eq("id",t).select("*, exhibitions(title), stalls(name)").maybeSingle();if(r)throw r;return i?f(i):null},getStallById:s,async login(t,e){const{data:i,error:r}=await n().auth.signInWithPassword({email:t.trim(),password:e});return r?null:g(i.user)},async signUp(t,e,i){const{data:r,error:a}=await n().auth.signUp({email:e.trim(),password:i,options:{data:{name:t.trim()}}});if(a)throw a;return{user:r.session?await g(r.user):null,confirmationRequired:!r.session}},async logout(){const{error:t}=await n().auth.signOut();if(t)throw t},async getCurrentUser(){const{data:t,error:e}=await n().auth.getUser();return e?null:g(t.user)},async getUsers(){const t=n(),{data:e,error:i}=await t.from("profiles").select("id, name, email, role").order("created_at",{ascending:!1});if(i)throw i;const{data:r,error:a}=await t.from("stalls").select("id, owner_id");if(a)throw a;const o=new Map((r??[]).map(l=>[l.owner_id,l.id]));return(e??[]).map(l=>({...l,stallId:o.get(l.id)}))},async createStall(t){const e=await this.getCurrentUser();if(!e)throw new Error("Please sign in before creating a stall.");if(e.stallId)throw new Error("You already have a stall.");const{data:i,error:r}=await n().from("stalls").insert({...y(t),owner_id:e.id,status:"pending_review",featured:!1}).select(d).single();if(r)throw r;return u(i)},async updateStall(t,e){const{data:i,error:r}=await n().from("stalls").update(y(e)).eq("id",t).select(d).maybeSingle();if(r)throw r;return i?u(i):null},async updateStallStatus(t,e){const{data:i,error:r}=await n().rpc("admin_update_stall_status",{target_stall_id:t,next_status:e});if(r)throw r;return i?s(t):null},async proposePartnership(t,e,i){const{data:r,error:a}=await n().from("partnership_requests").insert({proposer_stall_id:t.id,recipient_stall_id:e.id,message:i.trim(),status:"pending"}).select("*").single();if(a)throw a;return p(r)},async getPartnershipRequestsForStall(t){const{data:e,error:i}=await n().from("partnership_requests").select("*").or(`proposer_stall_id.eq.${t},recipient_stall_id.eq.${t}`).order("created_at",{ascending:!1});if(i)throw i;return Promise.all((e??[]).map(p))},async updatePartnershipRequestStatus(t,e){const{data:i,error:r}=await n().from("partnership_requests").update({status:e}).eq("id",t).select("*").maybeSingle();if(r)throw r;return i?p(i):null},async addGalleryItem(t,e){const{error:i}=await n().from("gallery_items").insert({stall_id:t,type:"image",url:e.trim()});if(i)throw i;return s(t)},async deleteGalleryItem(t,e){const{error:i}=await n().from("gallery_items").delete().eq("id",e).eq("stall_id",t);if(i)throw i;return s(t)},async addProduct(t,e){const{error:i}=await n().from("products").insert({stall_id:t,...q(e)});if(i)throw i;return s(t)},async updateProduct(t,e,i){const{error:r}=await n().from("products").update(q(i)).eq("id",e).eq("stall_id",t);if(r)throw r;return s(t)},async deleteProduct(t,e){const{error:i}=await n().from("products").delete().eq("id",e).eq("stall_id",t);if(i)throw i;return s(t)},async addPromotion(t,e){const{error:i}=await n().from("promotions").insert({stall_id:t,...P(e)});if(i)throw i;return s(t)},async updatePromotion(t,e,i){const{error:r}=await n().from("promotions").update(P(i)).eq("id",e).eq("stall_id",t);if(r)throw r;return s(t)},async deletePromotion(t,e){const{error:i}=await n().from("promotions").delete().eq("id",e).eq("stall_id",t);if(i)throw i;return s(t)},async createQuoteRequest(t,e){const{error:i}=await n().from("quote_requests").insert({stall_id:t,...E(e)});if(i)throw i},async getQuoteRequestsForStall(t){const{data:e,error:i}=await n().from("quote_requests").select("*, products(name)").eq("stall_id",t).order("created_at",{ascending:!1});if(i)throw i;return(e??[]).map(b)},async updateQuoteRequestStatus(t,e){const{data:i,error:r}=await n().from("quote_requests").update({status:e}).eq("id",t).select("*, products(name)").maybeSingle();if(r)throw r;return i?b(i):null}};export{D as api};
+import { requireSupabase } from '../supabaseClient';
+import type {
+  Exhibition,
+  ExhibitionBookingPackage,
+  ExhibitionBookingRequest,
+  ExhibitionBookingRequestInput,
+  ExhibitionBookingStatus,
+  ExhibitionInput,
+  ExhibitionStatus,
+  GalleryItem,
+  PartnershipRequest,
+  PreferredContactMethod,
+  Product,
+  ProductInput,
+  Promotion,
+  PromotionInput,
+  QuoteRequest,
+  QuoteRequestInput,
+  QuoteRequestStatus,
+  Stall,
+  StallInput,
+  User,
+} from '../types';
+
+/** A row shape returned by Supabase's JSON API (snake_case, loosely typed at the boundary). */
+type DbRow = Record<string, any>;
+
+const STALL_SELECT = '*, products(*), promotions(*), gallery_items(*), reviews(*)';
+const EXHIBITION_SELECT = `*, exhibition_stalls(booth_label, sort_order, stalls(${STALL_SELECT}))`;
+
+/* ------------------------------------------------------------------ */
+/* Row -> domain mappers                                               */
+/* ------------------------------------------------------------------ */
+
+function mapProduct(row: DbRow): Product {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    price: Number(row.price),
+    imageUrl: row.image_url,
+    listingType: row.listing_type ?? 'product',
+    category: row.category ?? '',
+    priceNote: row.price_note ?? '',
+    compareAtPrice: row.compare_at_price == null ? undefined : Number(row.compare_at_price),
+    isAvailable: row.is_available ?? true,
+    featured: row.featured ?? false,
+    sortOrder: row.sort_order ?? 0,
+  };
+}
+
+function mapPromotion(row: DbRow): Promotion {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    imageUrl: row.image_url,
+    promotionLabel: row.promotion_label,
+    startAt: row.start_at ?? undefined,
+    endAt: row.end_at ?? undefined,
+    isActive: row.is_active,
+    sortOrder: row.sort_order ?? 0,
+  };
+}
+
+function mapGalleryItem(row: DbRow): GalleryItem {
+  return {
+    id: row.id,
+    type: row.type,
+    url: row.url,
+    thumbnailUrl: row.thumbnail_url ?? undefined,
+    caption: row.caption ?? '',
+    sortOrder: row.sort_order ?? 0,
+  };
+}
+
+function mapStall(row: DbRow): Stall {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    name: row.name,
+    slogan: row.slogan,
+    category: row.category,
+    logo_url: row.logo_url,
+    banner_url: row.banner_url,
+    description: row.description,
+    mission: row.mission,
+    products: (row.products ?? [])
+      .map(mapProduct)
+      .sort(
+        (a, b) =>
+          Number(b.featured) - Number(a.featured) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+      ),
+    promotions: (row.promotions ?? []).map(mapPromotion).sort((a, b) => a.sortOrder - b.sortOrder),
+    gallery: (row.gallery_items ?? [])
+      .map(mapGalleryItem)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+    reviews: (row.reviews ?? []).map((review: DbRow) => ({
+      id: review.id,
+      author: review.author,
+      rating: review.rating,
+      comment: review.comment,
+      date: review.created_at,
+    })),
+    location: {
+      address: row.address,
+      lat: row.latitude ?? 0,
+      lng: row.longitude ?? 0,
+    },
+    contact: {
+      phone: row.phone,
+      email: row.email,
+      website: row.website,
+      whatsapp: row.whatsapp ?? '',
+      instagram: row.instagram ?? '',
+      facebook: row.facebook ?? '',
+    },
+    tradingHours: row.trading_hours ?? '',
+    featured: row.featured,
+    status: row.status,
+  };
+}
+
+function mapExhibition(row: DbRow): Exhibition {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description ?? '',
+    heroImageUrl: row.hero_image_url ?? '',
+    location: row.location ?? '',
+    startsAt: row.starts_at ?? undefined,
+    endsAt: row.ends_at ?? undefined,
+    status: row.status,
+    sortOrder: row.sort_order ?? 0,
+    stalls: (row.exhibition_stalls ?? [])
+      .filter((entry: DbRow) => entry.stalls)
+      .map((entry: DbRow) => ({
+        stall: mapStall(entry.stalls),
+        boothLabel: entry.booth_label || undefined,
+        sortOrder: entry.sort_order ?? 0,
+      }))
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+  };
+}
+
+function mapQuoteRequest(row: DbRow): QuoteRequest {
+  return {
+    id: row.id,
+    stallId: row.stall_id,
+    productId: row.product_id ?? undefined,
+    productName: row.products?.name,
+    requesterName: row.requester_name,
+    requesterPhone: row.requester_phone ?? '',
+    requesterEmail: row.requester_email ?? '',
+    preferredContact: row.preferred_contact,
+    message: row.message,
+    budgetNote: row.budget_note ?? '',
+    status: row.status,
+    createdAt: row.created_at,
+  };
+}
+
+function mapBookingRequest(row: DbRow): ExhibitionBookingRequest {
+  return {
+    id: row.id,
+    exhibitionId: row.exhibition_id,
+    exhibitionTitle: row.exhibitions?.title,
+    stallId: row.stall_id ?? undefined,
+    stallName: row.stalls?.name,
+    businessName: row.business_name,
+    contactName: row.contact_name,
+    email: row.email,
+    phone: row.phone,
+    requestedPackage: row.requested_package,
+    message: row.message,
+    status: row.status,
+    createdAt: row.created_at,
+  };
+}
+
+async function mapPartnershipRequest(row: DbRow): Promise<PartnershipRequest> {
+  const [proposerStall, recipientStall] = await Promise.all([
+    getStallById(row.proposer_stall_id),
+    getStallById(row.recipient_stall_id),
+  ]);
+  return {
+    id: row.id,
+    proposerStallId: row.proposer_stall_id,
+    recipientStallId: row.recipient_stall_id,
+    proposerStall: proposerStall ?? undefined,
+    recipientStall: recipientStall ?? undefined,
+    message: row.message,
+    status: row.status,
+    date: row.created_at,
+  };
+}
+
+async function toUser(
+  sessionUser: { id: string; email?: string | null } | null | undefined,
+): Promise<User | null> {
+  if (!sessionUser) return null;
+  const client = requireSupabase();
+
+  const { data: profile, error: profileError } = await client
+    .from('profiles')
+    .select('id, name, email, role')
+    .eq('id', sessionUser.id)
+    .maybeSingle();
+  if (profileError) throw profileError;
+
+  const { data: stall, error: stallError } = await client
+    .from('stalls')
+    .select('id')
+    .eq('owner_id', sessionUser.id)
+    .maybeSingle();
+  if (stallError) throw stallError;
+
+  return {
+    id: sessionUser.id,
+    email: profile?.email ?? sessionUser.email ?? undefined,
+    name: profile?.name ?? sessionUser.email?.split('@')[0] ?? 'Member',
+    role: profile?.role ?? 'user',
+    stallId: stall?.id,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Domain -> row builders (only include provided fields)              */
+/* ------------------------------------------------------------------ */
+
+function toStallRow(input: Partial<StallInput>): DbRow {
+  const row: DbRow = {};
+  if (input.name !== undefined) row.name = input.name.trim();
+  if (input.slogan !== undefined) row.slogan = input.slogan.trim();
+  if (input.category !== undefined) row.category = input.category;
+  if (input.logo_url !== undefined) row.logo_url = input.logo_url.trim();
+  if (input.banner_url !== undefined) row.banner_url = input.banner_url.trim();
+  if (input.description !== undefined) row.description = input.description.trim();
+  if (input.mission !== undefined) row.mission = input.mission.trim();
+  if (input.location?.address !== undefined) row.address = input.location.address.trim();
+  if (input.location?.lat !== undefined) row.latitude = input.location.lat;
+  if (input.location?.lng !== undefined) row.longitude = input.location.lng;
+  if (input.contact?.phone !== undefined) row.phone = input.contact.phone.trim();
+  if (input.contact?.email !== undefined) row.email = input.contact.email.trim();
+  if (input.contact?.website !== undefined) row.website = input.contact.website.trim();
+  if (input.contact?.whatsapp !== undefined) row.whatsapp = input.contact.whatsapp.trim();
+  if (input.contact?.instagram !== undefined) row.instagram = input.contact.instagram.trim();
+  if (input.contact?.facebook !== undefined) row.facebook = input.contact.facebook.trim();
+  if (input.tradingHours !== undefined) row.trading_hours = input.tradingHours.trim();
+  return row;
+}
+
+function toProductRow(input: Partial<ProductInput>): DbRow {
+  const row: DbRow = {};
+  if (input.name !== undefined) row.name = input.name.trim();
+  if (input.description !== undefined) row.description = input.description.trim();
+  if (input.price !== undefined) row.price = input.price;
+  if (input.imageUrl !== undefined) row.image_url = input.imageUrl.trim();
+  if (input.listingType !== undefined) row.listing_type = input.listingType;
+  if (input.category !== undefined) row.category = input.category.trim();
+  if (input.priceNote !== undefined) row.price_note = input.priceNote.trim();
+  // compareAtPrice may be intentionally set to null, so check presence not value.
+  if (Object.prototype.hasOwnProperty.call(input, 'compareAtPrice')) {
+    row.compare_at_price = input.compareAtPrice ?? null;
+  }
+  if (input.isAvailable !== undefined) row.is_available = input.isAvailable;
+  if (input.featured !== undefined) row.featured = input.featured;
+  if (input.sortOrder !== undefined) row.sort_order = input.sortOrder;
+  return row;
+}
+
+function toPromotionRow(input: Partial<PromotionInput>): DbRow {
+  const row: DbRow = {};
+  if (input.title !== undefined) row.title = input.title.trim();
+  if (input.description !== undefined) row.description = input.description.trim();
+  if (input.imageUrl !== undefined) row.image_url = input.imageUrl.trim();
+  if (input.promotionLabel !== undefined) row.promotion_label = input.promotionLabel.trim();
+  if (input.startAt !== undefined) row.start_at = input.startAt || null;
+  if (input.endAt !== undefined) row.end_at = input.endAt || null;
+  if (input.isActive !== undefined) row.is_active = input.isActive;
+  if (input.sortOrder !== undefined) row.sort_order = input.sortOrder;
+  return row;
+}
+
+function toExhibitionRow(input: Partial<ExhibitionInput>): DbRow {
+  const row: DbRow = {};
+  if (input.title !== undefined) row.title = input.title.trim();
+  if (input.description !== undefined) row.description = input.description.trim();
+  if (input.heroImageUrl !== undefined) row.hero_image_url = input.heroImageUrl.trim();
+  if (input.location !== undefined) row.location = input.location.trim();
+  if (input.startsAt !== undefined) row.starts_at = input.startsAt || null;
+  if (input.endsAt !== undefined) row.ends_at = input.endsAt || null;
+  if (input.status !== undefined) row.status = input.status;
+  if (input.sortOrder !== undefined) row.sort_order = input.sortOrder;
+  return row;
+}
+
+function toQuoteRow(input: QuoteRequestInput): DbRow {
+  return {
+    requester_name: input.requesterName.trim(),
+    requester_phone: input.requesterPhone.trim(),
+    requester_email: input.requesterEmail.trim(),
+    preferred_contact: input.preferredContact,
+    ...(input.productId ? { product_id: input.productId } : {}),
+    message: input.message.trim(),
+    budget_note: input.budgetNote.trim(),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Public API                                                          */
+/* ------------------------------------------------------------------ */
+
+export interface AdminMfaState {
+  enrolled: boolean;
+  verified: boolean;
+  factorId?: string;
+  pendingFactorId?: string;
+}
+
+async function getAdminMfaState(): Promise<AdminMfaState> {
+  const client = requireSupabase();
+  const [aal, factors] = await Promise.all([
+    client.auth.mfa.getAuthenticatorAssuranceLevel(),
+    client.auth.mfa.listFactors(),
+  ]);
+  if (aal.error) throw aal.error;
+  if (factors.error) throw factors.error;
+
+  const totp = factors.data.totp[0];
+  const pending = factors.data.all.find(
+    (factor) => factor.factor_type === 'totp' && factor.status === 'unverified',
+  );
+  return {
+    enrolled: Boolean(totp),
+    verified: aal.data.currentLevel === 'aal2',
+    factorId: totp?.id,
+    pendingFactorId: pending?.id,
+  };
+}
+
+async function enrolAdminMfa(): Promise<{ factorId: string; qrCode: string }> {
+  const state = await getAdminMfaState();
+  if (state.pendingFactorId) {
+    throw new Error(
+      'Two-factor setup is already waiting for verification. Enter a code from the authenticator entry you scanned to finish setup.',
+    );
+  }
+  const { data, error } = await requireSupabase().auth.mfa.enroll({
+    factorType: 'totp',
+    friendlyName: 'Exhistall administrator',
+  });
+  if (error) throw error;
+  return { factorId: data.id, qrCode: data.totp.qr_code };
+}
+
+async function verifyAdminMfa(factorId: string, code: string): Promise<void> {
+  const client = requireSupabase();
+  const { data, error: challengeError } = await client.auth.mfa.challenge({ factorId });
+  if (challengeError) throw challengeError;
+  const { error: verifyError } = await client.auth.mfa.verify({
+    factorId,
+    challengeId: data.id,
+    code,
+  });
+  if (verifyError) throw verifyError;
+}
+
+async function getStalls(): Promise<Stall[]> {
+  const { data, error } = await requireSupabase()
+    .from('stalls')
+    .select(STALL_SELECT)
+    .eq('status', 'active')
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapStall);
+}
+
+async function getAllStallsForAdmin(): Promise<Stall[]> {
+  const { data, error } = await requireSupabase()
+    .from('stalls')
+    .select(STALL_SELECT)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapStall);
+}
+
+async function getExhibitions(): Promise<Exhibition[]> {
+  const { data, error } = await requireSupabase()
+    .from('exhibitions')
+    .select(EXHIBITION_SELECT)
+    .eq('status', 'published')
+    .order('starts_at', { ascending: true, nullsFirst: false })
+    .order('sort_order');
+  if (error) throw error;
+  return (data ?? [])
+    .map(mapExhibition)
+    .filter((exhibition) => !exhibition.endsAt || new Date(exhibition.endsAt) >= new Date());
+}
+
+async function getAllExhibitionsForAdmin(): Promise<Exhibition[]> {
+  const { data, error } = await requireSupabase()
+    .from('exhibitions')
+    .select(EXHIBITION_SELECT)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapExhibition);
+}
+
+async function createExhibition(input: ExhibitionInput): Promise<Exhibition> {
+  const { data, error } = await requireSupabase()
+    .from('exhibitions')
+    .insert(toExhibitionRow(input))
+    .select(EXHIBITION_SELECT)
+    .single();
+  if (error) throw error;
+  return mapExhibition(data);
+}
+
+async function updateExhibition(
+  id: string,
+  input: Partial<ExhibitionInput>,
+): Promise<Exhibition | null> {
+  const { data, error } = await requireSupabase()
+    .from('exhibitions')
+    .update(toExhibitionRow(input))
+    .eq('id', id)
+    .select(EXHIBITION_SELECT)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapExhibition(data) : null;
+}
+
+async function deleteExhibition(id: string): Promise<void> {
+  const { error } = await requireSupabase().from('exhibitions').delete().eq('id', id);
+  if (error) throw error;
+}
+
+async function assignStallToExhibition(
+  exhibitionId: string,
+  stallId: string,
+  boothLabel = '',
+  sortOrder = 0,
+): Promise<void> {
+  const { error } = await requireSupabase().from('exhibition_stalls').insert({
+    exhibition_id: exhibitionId,
+    stall_id: stallId,
+    booth_label: boothLabel.trim(),
+    sort_order: sortOrder,
+  });
+  if (error) throw error;
+}
+
+async function removeStallFromExhibition(exhibitionId: string, stallId: string): Promise<void> {
+  const { error } = await requireSupabase()
+    .from('exhibition_stalls')
+    .delete()
+    .eq('exhibition_id', exhibitionId)
+    .eq('stall_id', stallId);
+  if (error) throw error;
+}
+
+async function createExhibitionBookingRequest(
+  exhibitionId: string,
+  input: ExhibitionBookingRequestInput,
+): Promise<ExhibitionBookingRequest> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Please sign in before requesting an exhibition stall.');
+  const { data, error } = await requireSupabase()
+    .from('exhibition_booking_requests')
+    .insert({
+      exhibition_id: exhibitionId,
+      requester_id: user.id,
+      ...(user.stallId ? { stall_id: user.stallId } : {}),
+      business_name: input.businessName.trim(),
+      contact_name: input.contactName.trim(),
+      email: input.email.trim(),
+      phone: input.phone.trim(),
+      requested_package: input.requestedPackage,
+      message: input.message.trim(),
+    })
+    .select('*, exhibitions(title), stalls(name)')
+    .single();
+  if (error) throw error;
+  return mapBookingRequest(data);
+}
+
+async function getExhibitionBookingRequestsForAdmin(): Promise<ExhibitionBookingRequest[]> {
+  const { data, error } = await requireSupabase()
+    .from('exhibition_booking_requests')
+    .select('*, exhibitions(title), stalls(name)')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapBookingRequest);
+}
+
+async function updateExhibitionBookingRequestStatus(
+  id: string,
+  status: ExhibitionBookingStatus,
+): Promise<ExhibitionBookingRequest | null> {
+  const { data, error } = await requireSupabase()
+    .from('exhibition_booking_requests')
+    .update({ status })
+    .eq('id', id)
+    .select('*, exhibitions(title), stalls(name)')
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapBookingRequest(data) : null;
+}
+
+async function getStallById(id: string): Promise<Stall | null> {
+  const { data, error } = await requireSupabase()
+    .from('stalls')
+    .select(STALL_SELECT)
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapStall(data) : null;
+}
+
+async function login(email: string, password: string): Promise<User | null> {
+  const { data, error } = await requireSupabase().auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
+  if (error) return null;
+  return toUser(data.user);
+}
+
+async function signUp(
+  name: string,
+  email: string,
+  password: string,
+): Promise<{ user: User | null; confirmationRequired: boolean }> {
+  const { data, error } = await requireSupabase().auth.signUp({
+    email: email.trim(),
+    password,
+    options: { data: { name: name.trim() } },
+  });
+  if (error) throw error;
+  return {
+    user: data.session ? await toUser(data.user) : null,
+    confirmationRequired: !data.session,
+  };
+}
+
+async function logout(): Promise<void> {
+  const { error } = await requireSupabase().auth.signOut();
+  if (error) throw error;
+}
+
+async function getCurrentUser(): Promise<User | null> {
+  const { data, error } = await requireSupabase().auth.getUser();
+  if (error) return null;
+  return toUser(data.user);
+}
+
+async function getUsers(): Promise<User[]> {
+  const client = requireSupabase();
+  const { data: profiles, error: profilesError } = await client
+    .from('profiles')
+    .select('id, name, email, role')
+    .order('created_at', { ascending: false });
+  if (profilesError) throw profilesError;
+
+  const { data: stalls, error: stallsError } = await client.from('stalls').select('id, owner_id');
+  if (stallsError) throw stallsError;
+
+  const stallIdByOwner = new Map<string, string>(
+    (stalls ?? []).map((stall: DbRow) => [stall.owner_id, stall.id]),
+  );
+  return (profiles ?? []).map((profile: DbRow): User => ({
+    id: profile.id,
+    email: profile.email ?? undefined,
+    name: profile.name,
+    role: profile.role ?? 'user',
+    stallId: stallIdByOwner.get(profile.id),
+  }));
+}
+
+async function createStall(input: StallInput): Promise<Stall> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Please sign in before creating a stall.');
+  if (user.stallId) throw new Error('You already have a stall.');
+  const { data, error } = await requireSupabase()
+    .from('stalls')
+    .insert({ ...toStallRow(input), owner_id: user.id, status: 'pending_review', featured: false })
+    .select(STALL_SELECT)
+    .single();
+  if (error) throw error;
+  return mapStall(data);
+}
+
+async function updateStall(id: string, input: Partial<StallInput>): Promise<Stall | null> {
+  const { data, error } = await requireSupabase()
+    .from('stalls')
+    .update(toStallRow(input))
+    .eq('id', id)
+    .select(STALL_SELECT)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapStall(data) : null;
+}
+
+async function updateStallStatus(id: string, status: Stall['status']): Promise<Stall | null> {
+  const { data, error } = await requireSupabase().rpc('admin_update_stall_status', {
+    target_stall_id: id,
+    next_status: status,
+  });
+  if (error) throw error;
+  return data ? getStallById(id) : null;
+}
+
+async function proposePartnership(
+  proposerStall: Stall,
+  recipientStall: Stall,
+  message: string,
+): Promise<PartnershipRequest> {
+  const { data, error } = await requireSupabase()
+    .from('partnership_requests')
+    .insert({
+      proposer_stall_id: proposerStall.id,
+      recipient_stall_id: recipientStall.id,
+      message: message.trim(),
+      status: 'pending',
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapPartnershipRequest(data);
+}
+
+async function getPartnershipRequestsForStall(stallId: string): Promise<PartnershipRequest[]> {
+  const { data, error } = await requireSupabase()
+    .from('partnership_requests')
+    .select('*')
+    .or(`proposer_stall_id.eq.${stallId},recipient_stall_id.eq.${stallId}`)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return Promise.all((data ?? []).map(mapPartnershipRequest));
+}
+
+async function updatePartnershipRequestStatus(
+  id: string,
+  status: PartnershipRequest['status'],
+): Promise<PartnershipRequest | null> {
+  const { data, error } = await requireSupabase()
+    .from('partnership_requests')
+    .update({ status })
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapPartnershipRequest(data) : null;
+}
+
+async function addGalleryItem(stallId: string, url: string): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('gallery_items')
+    .insert({ stall_id: stallId, type: 'image', url: url.trim() });
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function deleteGalleryItem(stallId: string, itemId: string): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('gallery_items')
+    .delete()
+    .eq('id', itemId)
+    .eq('stall_id', stallId);
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function addProduct(stallId: string, input: ProductInput): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('products')
+    .insert({ stall_id: stallId, ...toProductRow(input) });
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function updateProduct(
+  stallId: string,
+  productId: string,
+  input: Partial<ProductInput>,
+): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('products')
+    .update(toProductRow(input))
+    .eq('id', productId)
+    .eq('stall_id', stallId);
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function deleteProduct(stallId: string, productId: string): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('products')
+    .delete()
+    .eq('id', productId)
+    .eq('stall_id', stallId);
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function addPromotion(stallId: string, input: PromotionInput): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('promotions')
+    .insert({ stall_id: stallId, ...toPromotionRow(input) });
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function updatePromotion(
+  stallId: string,
+  promotionId: string,
+  input: Partial<PromotionInput>,
+): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('promotions')
+    .update(toPromotionRow(input))
+    .eq('id', promotionId)
+    .eq('stall_id', stallId);
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function deletePromotion(stallId: string, promotionId: string): Promise<Stall> {
+  const { error } = await requireSupabase()
+    .from('promotions')
+    .delete()
+    .eq('id', promotionId)
+    .eq('stall_id', stallId);
+  if (error) throw error;
+  return requireStall(stallId);
+}
+
+async function createQuoteRequest(stallId: string, input: QuoteRequestInput): Promise<void> {
+  const { error } = await requireSupabase()
+    .from('quote_requests')
+    .insert({ stall_id: stallId, ...toQuoteRow(input) });
+  if (error) throw error;
+}
+
+async function getQuoteRequestsForStall(stallId: string): Promise<QuoteRequest[]> {
+  const { data, error } = await requireSupabase()
+    .from('quote_requests')
+    .select('*, products(name)')
+    .eq('stall_id', stallId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapQuoteRequest);
+}
+
+async function updateQuoteRequestStatus(
+  id: string,
+  status: QuoteRequestStatus,
+): Promise<QuoteRequest | null> {
+  const { data, error } = await requireSupabase()
+    .from('quote_requests')
+    .update({ status })
+    .eq('id', id)
+    .select('*, products(name)')
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapQuoteRequest(data) : null;
+}
+
+/** Stall id is always valid right after a mutation; surface a clear error instead of `null`. */
+async function requireStall(id: string): Promise<Stall> {
+  const stall = await getStallById(id);
+  if (!stall) throw new Error('Stall could not be reloaded after the change.');
+  return stall;
+}
+
+export const api = {
+  // admin MFA
+  getAdminMfaState,
+  enrolAdminMfa,
+  verifyAdminMfa,
+  // public catalogue
+  getStalls,
+  getStallById,
+  getExhibitions,
+  // stallholder operations
+  createStall,
+  updateStall,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  addPromotion,
+  updatePromotion,
+  deletePromotion,
+  addGalleryItem,
+  deleteGalleryItem,
+  // networking + quotes
+  proposePartnership,
+  getPartnershipRequestsForStall,
+  updatePartnershipRequestStatus,
+  createQuoteRequest,
+  getQuoteRequestsForStall,
+  updateQuoteRequestStatus,
+  // exhibitions (admin)
+  getAllStallsForAdmin,
+  getAllExhibitionsForAdmin,
+  createExhibition,
+  updateExhibition,
+  deleteExhibition,
+  assignStallToExhibition,
+  removeStallFromExhibition,
+  createExhibitionBookingRequest,
+  getExhibitionBookingRequestsForAdmin,
+  updateExhibitionBookingRequestStatus,
+  // admin
+  updateStallStatus,
+  getUsers,
+  // auth
+  login,
+  signUp,
+  logout,
+  getCurrentUser,
+};
