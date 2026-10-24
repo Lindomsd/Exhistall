@@ -12,7 +12,6 @@ import {
 import { api } from './services/api';
 import { isSupabaseConfigured } from './supabaseClient';
 import Spinner from './components/Spinner';
-import SetupNotice from './components/SetupNotice';
 import NotFoundPage from './pages/NotFoundPage';
 import type {
   Exhibition,
@@ -613,10 +612,6 @@ function AppShell() {
         <Spinner label="Loading Exhistall…" />
       </div>
     );
-  }
-
-  if (!isSupabaseConfigured) {
-    return <SetupNotice />;
   }
 
   const commonProps = {
